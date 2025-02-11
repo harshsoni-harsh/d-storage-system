@@ -1,0 +1,31 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/src/main",
+  "scripts": {
+    "build": "nest build",
+    "start:dev": "nest start --watch",
+    "start:prod": "node ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@helia/unixfs": "^4.0.2",
+    "@nestjs/common": "^11.0.9",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.9",
+    "@nestjs/mapped-types": "*",
+    "@nestjs/platform-express": "^11.0.9",
+    "helia": "^5.2.0",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.2",
+    "@nestjs/schematics": "^11.0.0",
+    "@types/node": "^22.13.1",
+    "typescript": "^5.7.3"
+  }
+}
