@@ -6,6 +6,7 @@ import {
   Body,
   UseInterceptors,
   Query,
+  Res,
 } from "@nestjs/common";
 import { StorageService } from "./storage.service.js";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -58,11 +59,18 @@ export class StorageController {
    * Retrieve a file from IPFS by CID.
    */
   @Get("/getById")
-  async retrieveFile(@Query("cid") cid: string) {
+  async retrieveFile(@Query("cid") cid: string, @Res() res) {
+    
     console.log(`Retrieving file with CID: ${cid}`);
     const fileBuffer = await this.storageService.retrieveFile(cid);
     console.log(`Retrieved file with CID: ${cid}`);
-    return { file: fileBuffer.toString() };
+
+    res.set({
+      'Content-Type': 'application/octet-stream',
+      'Content-Disposition': `attachment; filename="retrieved-file.png"`,
+    });
+
+    res.send(fileBuffer);
   }
 
   @Get('/')

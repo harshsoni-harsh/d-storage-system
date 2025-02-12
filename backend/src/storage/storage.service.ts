@@ -1,10 +1,9 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import * as fs from "fs";
-import { HeliaLibp2p, createHelia } from "helia";
 import * as path from "path";
-import { unixfs } from "@helia/unixfs";
-
 import { fileURLToPath } from "url";
+import { HeliaLibp2p, createHelia } from "helia";
+import { unixfs } from "@helia/unixfs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,6 +40,13 @@ export class StorageService implements OnModuleInit {
         content: uint8Array,
       });
 
+      // Pin the file to keep it in your node
+      // this.helia.pins.add(cid);
+
+      for await (const pin of this.helia.pins.ls()) {
+        // console.log(`[${new Date().toISOString()}] Pin: ${pin}`);
+      };
+
       return cid.toString();
     } catch (error) {
       console.error("Error storing file:", error);
@@ -50,7 +56,7 @@ export class StorageService implements OnModuleInit {
 
   async retrieveFile(cid: string): Promise<Buffer> {
     try {
-      if (!this.fs) await this.initIPFS();
+      if (!this.fs) throw new Error('Helia is not initialized.');
 
       const fileChunks: Uint8Array[] = [];
       for await (const chunk of this.fs.cat(cid)) {
@@ -69,4 +75,21 @@ export class StorageService implements OnModuleInit {
       await this.helia.stop();
     }
   }
+}
+
+async function retrieveWithTimeout(asyncIterable: any, ms: number) {
+  const timer = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Operation timed out")), ms)
+  );
+
+  const chunks : any[] = [];
+  const retrieveFile = (async () => {
+    for await (const chunk of asyncIterable) {
+      chunks.push(chunk);
+    }
+    return chunks;
+  })();
+
+  // Race the timeout against the file retrieval
+  return Promise.race([retrieveFile, timer]);
 }
