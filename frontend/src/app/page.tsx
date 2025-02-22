@@ -13,7 +13,7 @@ const getFileHash = async (file: File | Blob) => {
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
-  const [cid, setCid] = useState<string[]>([""]);
+  const [cid, setCid] = useState<string>("");
   const [fileHash, setFileHash] = useState<string>("");
 
   const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -51,9 +51,11 @@ export default function Home() {
         });
 
         const data = await res.json();
-        chunkCIDs.push(data.cid);
         uploadedChunks++;
         console.log(`Uploaded chunk ${uploadedChunks}/${totalChunks}`);
+        if (i == totalChunks - 1) {
+          setCid(data.cid)
+        }
       }
       console.log("All chunks uploaded:", chunkCIDs);
     } catch (error) {
@@ -124,38 +126,36 @@ export default function Home() {
             Upload to IPFS
           </button>
         </div>
-        {cid && (
-          <div className="flex flex-col gap-4 border border-zinc-600 p-8 rounded-lg">
-            <div className="flex items-center justify-between gap-2">
-              <p className="font-bold text-lg max-md:hidden">CID: </p>
-              <input
-                type="text"
-                placeholder="CID"
-                value={cid[0]}
-                onChange={(e) => setCid([e.target.value])}
-                className="inline bg-zinc-950 border border-zinc-500 rounded-md px-2 py-1 max-md:w-full"
-              />
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <p className="font-bold text-lg max-md:hidden">
-                Original file hash:{" "}
-              </p>
-              <input
-                type="text"
-                placeholder="SHA-256 hash"
-                value={fileHash}
-                onChange={(e) => setFileHash(e.target.value)}
-                className="inline bg-zinc-950 border border-zinc-500 rounded-md px-2 py-1 max-md:w-full"
-              />
-            </div>
-            <button
-              className="py-2 px-4 border rounded-full"
-              onClick={handleRetrieve}
-            >
-              Retrieve from IPFS
-            </button>
+        <div className="flex flex-col gap-4 border border-zinc-600 p-8 rounded-lg">
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-bold text-lg max-md:hidden">CID: </p>
+            <input
+              type="text"
+              placeholder="CID"
+              value={cid}
+              onChange={(e) => setCid(e.target.value)}
+              className="inline bg-zinc-950 border border-zinc-500 rounded-md px-2 py-1 max-md:w-full"
+            />
           </div>
-        )}
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-bold text-lg max-md:hidden">
+              Original file hash:{" "}
+            </p>
+            <input
+              type="text"
+              placeholder="SHA-256 hash"
+              value={fileHash}
+              onChange={(e) => setFileHash(e.target.value)}
+              className="inline bg-zinc-950 border border-zinc-500 rounded-md px-2 py-1 max-md:w-full"
+            />
+          </div>
+          <button
+            className="py-2 px-4 border rounded-full"
+            onClick={handleRetrieve}
+          >
+            Retrieve from IPFS
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -13,69 +13,65 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
+import { readFile } from "fs/promises";
+import { Multer } from "multer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-@Controller('storage')
+@Controller("storage")
 export class StorageController {
-  constructor(private readonly storageService: StorageService) {}
-
   private storagePath = path.join(__dirname, "..", "..", "uploads");
 
-  /**
-   * Upload a chunk of a file.
-   */
+  constructor(private readonly storageService: StorageService) {}
+
   @Post("/upload-chunk")
   @UseInterceptors(FileInterceptor("file"))
   async uploadChunk(
-    @UploadedFile() file,
+    @UploadedFile() file: Express.Multer.File,
     @Body("chunkIndex") chunkIndex: string,
     @Body("totalChunks") totalChunks: string,
     @Body("fileName") fileName: string
-  ): Promise<{ message: string; cid: string; } | { message: string; cid?: undefined; }> {
+  ): Promise<{ message: string; cid?: string }> {
     if (!fs.existsSync(this.storagePath)) {
       fs.mkdirSync(this.storagePath, { recursive: true });
     }
 
     const filePath = path.join(this.storagePath, fileName);
-
-    // Append the chunk to the final file
     fs.appendFileSync(filePath, file.buffer);
 
     console.log(`Received chunk ${chunkIndex}/${totalChunks} for ${fileName}`);
 
-    // If last chunk, store file in IPFS
     if (parseInt(chunkIndex) + 1 === parseInt(totalChunks)) {
       console.log(`All chunks received. Storing ${fileName} in IPFS...`);
-      const cid = await this.storageService.storeFile(file.buffer, filePath);
+      const fileBuffer = await readFile(filePath);
+      const cid = await this.storageService.storeFile(fileBuffer);
+
+      // Cleanup temp file after upload
+      fs.unlinkSync(filePath);
+
       return { message: "File upload complete", cid };
     }
 
     return { message: `Chunk ${chunkIndex} received` };
   }
 
-  /**
-   * Retrieve a file from IPFS by CID.
-   */
   @Get("/getById")
   async retrieveFile(@Query("cid") cid: string, @Res() res) {
-    
-    console.log(`Retrieving file with CID: ${cid}`);
-    const fileBuffer = await this.storageService.retrieveFile(cid);
-    console.log(`Retrieved file with CID: ${cid}`);
+    try {
+      console.log(`Retrieving file with CID: ${cid}`);
+      const fileBuffer = await this.storageService.retrieveFile(cid);
+      console.log(`Successfully retrieved file with CID: ${cid}`);
 
-    res.set({
-      'Content-Type': 'application/octet-stream',
-      'Content-Disposition': `attachment; filename="retrieved-file.png"`,
-    });
+      res.set({
+        "Content-Type": "application/octet-stream",
+        "Content-Disposition": `attachment; filename="retrieved-file"`,
+      });
 
-    res.send(fileBuffer);
-  }
-
-  @Get('/')
-  run() {
-    return "hello"
+      res.send(fileBuffer);
+    } catch (error) {
+      res.status(500).send({ error: "File retrieval failed" });
+    }
   }
 
   async onApplicationShutdown(): Promise<void> {

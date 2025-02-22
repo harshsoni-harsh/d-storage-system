@@ -1,4 +1,8 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
+import {
+  Injectable,
+  OnModuleInit,
+  OnApplicationShutdown,
+} from "@nestjs/common";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
@@ -9,11 +13,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 @Injectable()
-export class StorageService implements OnModuleInit {
-  private helia: HeliaLibp2p;
+export class StorageService implements OnModuleInit, OnApplicationShutdown {
+  private helia?: HeliaLibp2p;
   private fs: any;
   private storagePath = path.join(__dirname, "..", "..", "uploads");
 
+  // temporary upload storage
   async onModuleInit() {
     await this.initIPFS();
     if (!fs.existsSync(this.storagePath)) {
@@ -22,30 +27,22 @@ export class StorageService implements OnModuleInit {
   }
 
   private async initIPFS() {
-    if (!this.helia || !this.fs) {
+    if (!this.helia) {
       this.helia = await createHelia();
       this.fs = unixfs(this.helia);
     }
   }
 
-  async storeFile(fileBuffer: Buffer, fileName: string): Promise<string> {
+  async storeFile(fileBuffer: Buffer): Promise<string> {
     try {
       if (!this.fs) await this.initIPFS();
 
-      // Convert Buffer to Uint8Array (Helia requires this format)
       const uint8Array = new Uint8Array(fileBuffer);
-
-      // Store in IPFS
       const cid = await this.fs.addFile({
         content: uint8Array,
       });
 
-      // Pin the file to keep it in your node
-      // this.helia.pins.add(cid);
-
-      for await (const pin of this.helia.pins.ls()) {
-        // console.log(`[${new Date().toISOString()}] Pin: ${pin}`);
-      };
+      console.log(`File stored in Helia with CID: ${cid.toString()}`);
 
       return cid.toString();
     } catch (error) {
@@ -56,12 +53,14 @@ export class StorageService implements OnModuleInit {
 
   async retrieveFile(cid: string): Promise<Buffer> {
     try {
-      if (!this.fs) throw new Error('Helia is not initialized.');
+      if (!this.fs) throw new Error("Helia is not initialized.");
 
-      const fileChunks: Uint8Array[] = [];
-      for await (const chunk of this.fs.cat(cid)) {
-        fileChunks.push(chunk);
-      }
+      const asyncIterable = this.fs.cat(cid);
+
+      const fileChunks: Uint8Array[] = await this.retrieveWithTimeout(
+        asyncIterable,
+        10000
+      );
 
       return Buffer.concat(fileChunks);
     } catch (error) {
@@ -71,25 +70,28 @@ export class StorageService implements OnModuleInit {
   }
 
   async onApplicationShutdown(): Promise<void> {
-    if (this.helia != null) {
+    if (this.helia) {
+      console.log("Shutting down Helia...");
       await this.helia.stop();
     }
   }
-}
 
-async function retrieveWithTimeout(asyncIterable: any, ms: number) {
-  const timer = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Operation timed out")), ms)
-  );
+  private async retrieveWithTimeout(
+    asyncIterable: AsyncIterable<Uint8Array>,
+    ms: number
+  ): Promise<Uint8Array[]> {
+    const timer = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Operation timed out")), ms)
+    );
 
-  const chunks : any[] = [];
-  const retrieveFile = (async () => {
-    for await (const chunk of asyncIterable) {
-      chunks.push(chunk);
-    }
-    return chunks;
-  })();
+    const chunks: Uint8Array[] = [];
+    const retrieveFile = (async () => {
+      for await (const chunk of asyncIterable) {
+        chunks.push(chunk);
+      }
+      return chunks;
+    })();
 
-  // Race the timeout against the file retrieval
-  return Promise.race([retrieveFile, timer]);
+    return Promise.race([retrieveFile, timer]);
+  }
 }
