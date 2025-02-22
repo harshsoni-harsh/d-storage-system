@@ -1,12 +1,13 @@
 {
-  "name": "backend",
+  "name": "@d-storage-system/backend",
   "version": "1.0.0",
   "description": "",
+  "private": true,
   "main": "dist/src/main",
   "scripts": {
     "build": "nest build",
-    "start:dev": "nest start --watch",
-    "start:prod": "node ."
+    "dev": "nest start --watch",
+    "prod": "node ."
   },
   "keywords": [],
   "author": "",

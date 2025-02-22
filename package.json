@@ -1,0 +1,15 @@
+{
+  "name": "d-storage-system",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r run dev"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@ipshipyard/node-datachannel",
+      "@nestjs/core",
+      "sharp"
+    ]
+  }
+}

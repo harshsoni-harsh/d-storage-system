@@ -1,5 +1,5 @@
 {
-  "name": "d-storage-system",
+  "name": "@d-storage-system/frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
