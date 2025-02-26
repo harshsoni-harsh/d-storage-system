@@ -6,66 +6,68 @@ import {
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
-import { HeliaLibp2p, createHelia } from "helia";
-import { unixfs } from "@helia/unixfs";
+import { createHelia, Helia } from "helia";
+import { unixfs, UnixFS } from "@helia/unixfs";
+import { create as createIpfsClient, IPFSHTTPClient } from "ipfs-http-client";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 @Injectable()
 export class StorageService implements OnModuleInit, OnApplicationShutdown {
-  private helia?: HeliaLibp2p;
-  private fs: any;
-  private storagePath = path.join(__dirname, "..", "..", "uploads");
+  private helia?: Helia;
+  private unixFs?: any;
+  private ipfsClient!: IPFSHTTPClient;
+  private readonly storagePath = path.join(__dirname, "..", "..", "uploads");
 
-  // temporary upload storage
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     await this.initIPFS();
-    if (!fs.existsSync(this.storagePath)) {
-      fs.mkdirSync(this.storagePath, { recursive: true });
-    }
+    this.ensureStorageDirectory();
   }
 
-  private async initIPFS() {
-    if (!this.helia) {
-      this.helia = await createHelia();
-      this.fs = unixfs(this.helia);
+  private async initIPFS(): Promise<void> {
+    if (this.helia) return; // Prevents redundant initialization
+
+    this.helia = await createHelia();
+    this.unixFs = unixfs(this.helia);
+    this.ipfsClient = createIpfsClient({ url: "http://localhost:5001" });
+
+    console.log("Helia and IPFS client initialized.");
+  }
+
+  private ensureStorageDirectory(): void {
+    if (!fs.existsSync(this.storagePath)) {
+      fs.mkdirSync(this.storagePath, { recursive: true });
+      console.log(`Storage directory created at ${this.storagePath}`);
     }
   }
 
   async storeFile(fileBuffer: Buffer): Promise<string> {
-    try {
-      if (!this.fs) await this.initIPFS();
+    if (!this.unixFs) throw new Error("Helia is not initialized.");
 
-      const uint8Array = new Uint8Array(fileBuffer);
-      const cid = await this.fs.addFile({
-        content: uint8Array,
-      });
+    const uint8Array = new Uint8Array(fileBuffer);
+    const cid = await this.unixFs.addFile({ content: uint8Array });
+    const cidStr = cid.toString();
 
-      console.log(`File stored in Helia with CID: ${cid.toString()}`);
+    console.log(`File stored with CID: ${cidStr}`);
 
-      return cid.toString();
-    } catch (error) {
-      console.error("Error storing file:", error);
-      throw new Error("Failed to store file");
-    }
+    // Pin the file via Kubo to persist storage
+    await this.ipfsClient.pin.add(cidStr);
+    console.log(`File pinned with CID: ${cidStr}`);
+
+    return cidStr;
   }
 
   async retrieveFile(cid: string): Promise<Buffer> {
+    if (!this.unixFs) throw new Error("Helia is not initialized.");
+
     try {
-      if (!this.fs) throw new Error("Helia is not initialized.");
-
-      const asyncIterable = this.fs.cat(cid);
-
-      const fileChunks: Uint8Array[] = await this.retrieveWithTimeout(
-        asyncIterable,
-        10000
-      );
-
+      const asyncIterable = this.unixFs.cat(cid);
+      const fileChunks = await this.retrieveWithTimeout(asyncIterable, 10000);
       return Buffer.concat(fileChunks);
     } catch (error) {
-      console.error("Error retrieving file:", error);
-      throw new Error("Failed to retrieve file");
+      console.error(`Error retrieving file with CID ${cid}:`, error);
+      throw new Error("Failed to retrieve file from IPFS.");
     }
   }
 
@@ -78,20 +80,20 @@ export class StorageService implements OnModuleInit, OnApplicationShutdown {
 
   private async retrieveWithTimeout(
     asyncIterable: AsyncIterable<Uint8Array>,
-    ms: number
+    timeoutMs: number
   ): Promise<Uint8Array[]> {
-    const timer = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("Operation timed out")), ms)
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("File retrieval timed out")), timeoutMs)
     );
 
-    const chunks: Uint8Array[] = [];
-    const retrieveFile = (async () => {
+    const fileChunks: Uint8Array[] = [];
+    const retrieve = (async () => {
       for await (const chunk of asyncIterable) {
-        chunks.push(chunk);
+        fileChunks.push(chunk);
       }
-      return chunks;
+      return fileChunks;
     })();
 
-    return Promise.race([retrieveFile, timer]);
+    return Promise.race([retrieve, timeout]);
   }
 }
