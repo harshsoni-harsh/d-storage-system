@@ -106,4 +106,10 @@ export class StorageController {
   async onApplicationShutdown(): Promise<void> {
     await this.storageService.onApplicationShutdown();
   }
+
+  @Get("/pinned-files")
+  async getPinnedFiles() {
+    return await this.storageService.getPinnedFiles();
+  }
+
 }

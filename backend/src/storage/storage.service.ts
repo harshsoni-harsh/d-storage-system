@@ -26,7 +26,7 @@ export class StorageService implements OnModuleInit, OnApplicationShutdown {
   }
 
   private async initIPFS(): Promise<void> {
-    if (this.helia) return; // Prevents redundant initialization
+    if (this.helia) return;
 
     this.helia = await createHelia();
     this.unixFs = unixfs(this.helia);
@@ -68,6 +68,19 @@ export class StorageService implements OnModuleInit, OnApplicationShutdown {
     } catch (error) {
       console.error(`Error retrieving file with CID ${cid}:`, error);
       throw new Error("Failed to retrieve file from IPFS.");
+    }
+  }
+
+  async getPinnedFiles(): Promise<string[]> {
+    try {
+      const pinnedFiles: string[] = [];
+      for await (const pin of this.ipfsClient.pin.ls({ type: "recursive" }))
+        if (pin.cid.toString() != "QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn") // This is the hash of an empty unix dir. It's auto added.
+          pinnedFiles.push(pin.cid.toString());
+      return pinnedFiles;
+    } catch (error) {
+      console.error("Error fetching pinned files:", error);
+      throw new Error("Failed to fetch pinned files from IPFS.");
     }
   }
 
