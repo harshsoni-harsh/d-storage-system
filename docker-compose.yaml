@@ -1,0 +1,11 @@
+services:
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: ipfs_kubo
+    ports:
+      - "4001:4001"  # Swarm port for p2p communication
+      - "5001:5001"  # API port
+      - "8080:8080"  # Gateway port
+    volumes:
+      - ./ipfs_data:/data/ipfs
+    restart: unless-stopped

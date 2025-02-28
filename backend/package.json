@@ -21,6 +21,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.9",
     "helia": "^5.2.0",
+    "ipfs-http-client": "^60.0.1",
     "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
