@@ -1,11 +1,41 @@
+networks:
+  d-storage-network:
+    driver: bridge
+
+volumes:
+  ipfs-data:
+    driver: local
+    name: ipfs-data
+
 services:
   ipfs:
     image: ipfs/kubo:latest
-    container_name: ipfs_kubo
-    ports:
-      - "4001:4001"  # Swarm port for p2p communication
-      - "5001:5001"  # API port
-      - "8080:8080"  # Gateway port
+    container_name: ipfs-kubo
+    user: "0:0"
+    networks:
+      - d-storage-network
     volumes:
-      - ./ipfs_data:/data/ipfs
+      - ipfs-data:/data/ipfs
     restart: unless-stopped
+  
+  backend:
+    privileged: true
+    build: ./backend
+    container_name: d-storage-backend
+    networks:
+      - d-storage-network
+    environment:
+      - KUBO_URL=http://ipfs-kubo:5001
+    depends_on:
+      - ipfs
+  
+  frontend:
+    build: ./frontend
+    container_name: d-storage-frontend
+    networks:
+      - d-storage-network
+    environment:
+      - API_BASE_URL=http://d-storage-backend:3002/storage
+    ports:
+      - "3000:3000"
+  

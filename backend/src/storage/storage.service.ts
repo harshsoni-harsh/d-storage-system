@@ -8,16 +8,17 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { createHelia, Helia } from "helia";
 import { unixfs, UnixFS } from "@helia/unixfs";
-import { create as createIpfsClient, IPFSHTTPClient } from "ipfs-http-client";
+import { create as createIpfsClient, KuboRPCClient } from "kubo-rpc-client";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const KUBO_URL = process.env.KUBO_URL || "http://localhost:5001";
 
 @Injectable()
 export class StorageService implements OnModuleInit, OnApplicationShutdown {
   private helia?: Helia;
   private unixFs?: any;
-  private ipfsClient!: IPFSHTTPClient;
+  private ipfsClient!: KuboRPCClient;
   private readonly storagePath = path.join(__dirname, "..", "..", "uploads");
 
   async onModuleInit(): Promise<void> {
@@ -30,7 +31,7 @@ export class StorageService implements OnModuleInit, OnApplicationShutdown {
 
     this.helia = await createHelia();
     this.unixFs = unixfs(this.helia);
-    this.ipfsClient = createIpfsClient({ url: "http://localhost:5001" });
+    this.ipfsClient = createIpfsClient({ url: KUBO_URL });
 
     console.log("Helia and IPFS client initialized.");
   }

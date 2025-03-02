@@ -12,7 +12,6 @@ import {
 } from "@nestjs/common";
 import { StorageService } from "./storage.service.js";
 import { FileInterceptor } from "@nestjs/platform-express";
-import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { promises as fsPromises } from "fs";
