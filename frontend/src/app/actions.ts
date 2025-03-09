@@ -1,9 +1,9 @@
 "use server";
 
-const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3002/storage";
+const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3002";
 
 export async function fetchCID({ cid }: { cid: string }) {
-  const backendURL = `${API_BASE_URL}/getById?cid=${cid}`;
+  const backendURL = `${API_BASE_URL}/storage/getById?cid=${cid}`;
 
   const res = await fetch(backendURL);
   if (!res.ok) throw new Error(`Error retrieving file: ${res.statusText}`);
@@ -12,7 +12,7 @@ export async function fetchCID({ cid }: { cid: string }) {
 }
 
 export async function fetchPinnedFiles(): Promise<string[]> {
-  const backendURL = `${API_BASE_URL}/pinned-files`;
+  const backendURL = `${API_BASE_URL}/storage/pinned-files`;
   const res = await fetch(backendURL);
   if (!res.ok) throw new Error("Failed to fetch pinned files");
 
@@ -33,7 +33,7 @@ export async function uploadChunk(
     formData.append("totalChunks", totalChunks.toString());
     formData.append("fileName", fileName);
 
-    const res = await fetch(`${API_BASE_URL}/upload-chunk`, {
+    const res = await fetch(`${API_BASE_URL}/storage/upload-chunk`, {
       method: "POST",
       body: formData,
     });
@@ -47,6 +47,36 @@ export async function uploadChunk(
     return { success: true, cid: data.cid };
   } catch (error) {
     console.error("Upload error:", error);
-    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+export async function fetchPeers() {
+  const res = await fetch(`${API_BASE_URL}/peers`);
+  const data = await res.json();
+
+  return data;
+}
+
+export async function connectPeer(addr: string) {
+  const res = await fetch(`${API_BASE_URL}/peers`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      peerId: addr
+    }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to connect peer");
+  } else {
+    return data;
   }
 }
