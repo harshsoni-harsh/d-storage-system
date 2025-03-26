@@ -12,8 +12,11 @@ services:
     image: ipfs/kubo:latest
     container_name: ipfs-kubo
     user: "0:0"
-    networks:
-      - d-storage-network
+    ports:
+      - 5001:5001
+      - 4001:4001
+      - 8080:8080
+    network_mode: host
     volumes:
       - ipfs-data:/data/ipfs
     restart: unless-stopped
