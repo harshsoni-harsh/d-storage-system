@@ -29,7 +29,7 @@ const config = createConfig(
     walletConnectProjectId,
     appName: "D Storage System",
     appDescription: "A decentralized storage system using Web3",
-    appUrl: "http://localhost:3000",
+    appUrl: "http://localhost:3000/",
     appIcon: "../../../public/vercel.svg",
   })
 );
