@@ -12,8 +12,8 @@ export default function Home() {
   const [cid, setCid] = useState<string>("");
 
   return (
-    <div className="h-full flex flex-col items-center justify-center">
-      <div className="flex py-2 gap-8">
+    <div className="h-full flex flex-col items-center justify-center p-8">
+      <div className="flex py-2 gap-8 max-xl:flex-col max-w-full">
         <div className="flex flex-col gap-4">
           <p className="text-xl font-bold">Manage files on IPFS with Helia</p>
           <UploadFile {...{ setCid }} />
@@ -150,7 +150,7 @@ function PinnedFiles() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-4 border border-zinc-600 p-8 rounded-lg w-full">
+    <div className="flex flex-col gap-4 border border-zinc-600 p-8 rounded-lg">
       <p className="text-lg font-bold">Pinned Files</p>
       {pinnedFiles.length > 0 ? (
         pinnedFiles.map((cid, index) => (
@@ -158,9 +158,7 @@ function PinnedFiles() {
             key={index}
             className="flex justify-between items-center border border-zinc-500 p-2 m-2 rounded-md"
           >
-            <div>
-              <p className="text-sm font-bold mx-4">{cid}</p>
-            </div>
+            <p className="text-sm font-bold mx-4 truncate">{cid}</p>
             <Button variant={"outline"} onClick={() => handleRetrieve(cid)}>
               Retrieve
             </Button>

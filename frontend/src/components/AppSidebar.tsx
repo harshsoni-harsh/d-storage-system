@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -12,8 +13,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import ThemeToggle from "./theme-toggler";
-import ConnectButton from "@/components/custombuttonconnectkit"; // Use the custom ConnectKit button
+import ThemeToggle from "./ThemeToggler";
+import { ConnectKitButton } from "connectkit";
+import { useTheme } from "next-themes";
 
 const items = [
   {
@@ -34,10 +36,11 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const { theme } = useTheme() as { theme: 'light' | 'dark' | undefined };
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <ThemeToggle />
+    <Sidebar className="max-w-48">
+      <SidebarHeader className="mx-auto mt-2">
+        <ConnectKitButton mode={theme}  />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -67,9 +70,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <div className="p-4">
-        <ConnectButton /> {/* Custom ConnectKit button with styling */}
-      </div>
+      <SidebarFooter className="mx-2 mb-2">
+        <ThemeToggle />
+      </SidebarFooter>
     </Sidebar>
   );
 }

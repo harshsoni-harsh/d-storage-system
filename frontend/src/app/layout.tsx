@@ -1,7 +1,7 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { ThemeProvider } from "@/components/theme-provider";
+import { AppSidebar } from "@/components/AppSidebar";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Web3Provider } from "../components/providers/web3provider"; // Adjust path as needed
+import { Web3Provider } from "../components/providers/WalletProvider"; // Adjust path as needed
 import type { Metadata } from "next";
 import "./globals.css";
 
