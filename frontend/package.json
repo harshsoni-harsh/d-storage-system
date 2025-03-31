@@ -54,6 +54,9 @@
       "@ipshipyard/node-datachannel",
       "@nestjs/core",
       "sharp"
-    ]
+    ],
+    "patchedDependencies": {
+      "connectkit": "patches/connectkit.patch"
+    }
   }
 }

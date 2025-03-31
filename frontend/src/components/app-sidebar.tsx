@@ -1,6 +1,7 @@
 "use client";
 import { CircuitBoard, Home } from "lucide-react";
 import { ConnectKitButton } from "connectkit";
+import Link from "next/link"; // Import Link from Next.js
 import {
   Sidebar,
   SidebarContent,
@@ -16,17 +17,17 @@ import ThemeToggle from "./theme-toggler";
 const items = [
   {
     title: "Home",
-    url: "/",
+    url: "/", // valid URL
     icon: Home,
   },
   {
     title: "Connections",
-    url: "/connections",
+    url: "/connections", // valid URL
     icon: CircuitBoard,
   },
   {
     title: "Storage Providers",
-    url: "/",
+    url: "/", // valid URL; if you want this non-clickable, set url to "" or null
     icon: CircuitBoard,
   },
 ];
@@ -41,24 +42,32 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  {item.url ? (
-                    <SidebarMenuButton asChild>
-                      <a href={item.url}>
+              {items.map((item) => {
+                // Trim the URL to remove accidental whitespace
+                const trimmedUrl = item.url ? item.url.trim() : "";
+                // Log the URL for debugging
+                console.log(`Rendering item: ${item.title} with URL: "${trimmedUrl}"`);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    {trimmedUrl !== "" ? (
+                      <SidebarMenuButton asChild>
+                        <Link href={trimmedUrl}>
+                          <div className="flex items-center space-x-2">
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </div>
+                        </Link>
+                      </SidebarMenuButton>
+                    ) : (
+                      // If URL is empty, render a non-clickable element.
+                      <div className="flex items-center space-x-2">
                         <item.icon />
                         <span>{item.title}</span>
-                      </a>
-                    </SidebarMenuButton>
-                  ) : (
-                    // If there's no URL, render a non-clickable element:
-                    <div className="flex items-center space-x-2">
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </div>
-                  )}
-                </SidebarMenuItem>
-              ))}
+                      </div>
+                    )}
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
