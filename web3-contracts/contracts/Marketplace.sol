@@ -6,7 +6,7 @@ import "./Provider.sol";
 import "./Deal.sol";
 
 contract Marketplace {
-    address[] public providerList;
+    address[] providerList;
     mapping(address => address) public providers;
 
     event ProviderRegistered(address indexed providerAddress, address indexed providerInstance);
@@ -19,6 +19,10 @@ contract Marketplace {
     modifier onlyProvider(address _provider) {
         require(address(providers[_provider]) != address(0), "Not a registered provider");
         _;
+    }
+
+    function getProviderList() public view returns (address[] memory) {
+        return providerList;
     }
 
     function registerProvider(

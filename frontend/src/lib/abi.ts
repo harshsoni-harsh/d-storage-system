@@ -44,7 +44,13 @@ export const marketplaceABI = [
       {
         "indexed": true,
         "internalType": "address",
-        "name": "provider",
+        "name": "providerAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "providerInstance",
         "type": "address"
       }
     ],
@@ -72,6 +78,19 @@ export const marketplaceABI = [
     "name": "createDeal",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getProviderList",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
