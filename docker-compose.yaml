@@ -9,6 +9,7 @@ volumes:
 
 services:
   ipfs:
+    privileged: true
     image: ipfs/kubo:latest
     user: "0:0"
     ports:
@@ -18,7 +19,7 @@ services:
     networks: 
       - d-storage-network
     volumes:
-      - ipfs-data:/data/ipfs
+      - ./data/ipfs:/data/ipfs
     restart: unless-stopped
   
   backend:
@@ -29,8 +30,8 @@ services:
       - 3002:3002
     networks:
       - d-storage-network
-    environment:
-      - KUBO_URL=http://kubo:5001
+    env_file:
+      - .env
     depends_on:
       - ipfs
   
@@ -39,8 +40,8 @@ services:
     container_name: d-storage-frontend
     networks:
       - d-storage-network
-    environment:
-      - API_BASE_URL=http://d-storage-backend:3002
+    env_file:
+      - .env
     ports:
       - 3000:3000
   

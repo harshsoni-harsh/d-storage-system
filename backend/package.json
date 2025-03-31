@@ -20,6 +20,8 @@
     "@nestjs/core": "^11.0.12",
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/platform-express": "^11.0.12",
+    "blockstore-fs": "^2.0.2",
+    "datastore-fs": "^10.0.2",
     "helia": "^5.3.0",
     "kubo-rpc-client": "^5.1.0",
     "reflect-metadata": "^0.2.2"

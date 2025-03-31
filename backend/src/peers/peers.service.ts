@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { create as createIpfsClient, KuboRPCClient } from "kubo-rpc-client";
 
 const KUBO_URL = process.env.KUBO_URL || "http://localhost:5001";
@@ -9,17 +9,17 @@ export class PeersService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     this.ipfsClient = createIpfsClient({ url: KUBO_URL });
-    console.log("IPFS client initialized.");
+    Logger.debug("IPFS client initialized.", "peers");
   }
 
   async addPeer(peerId: any) {
     try {
-      console.log(`Connecting to ${peerId}`);
+      Logger.debug(`Connecting to ${peerId}`, "peers");
       await this.ipfsClient.swarm.connect(peerId, { timeout: 10000 });
-      console.log(`Successfully connected to ${peerId}`);
+      Logger.debug(`Successfully connected to ${peerId}`, "peers");
       return { message: "New peer has been added" };
     } catch (error) {
-      console.error(`Failed to connect peer: ${peerId}`, error);
+      Logger.error(`Failed to connect peer: ${peerId} ${error}`, "peers");
       throw new Error("IPFS peer connection failed");
     }
   }
@@ -29,9 +29,10 @@ export class PeersService implements OnModuleInit {
       const peers = await this.ipfsClient.swarm.peers({
         latency: true,
       });
+      Logger.debug(`${peers?.length ?? 0} peers found`, "peers");
       return peers;
     } catch (error) {
-      console.error("Failed to fetch peers", error);
+      Logger.error("Failed to fetch peers", error, "peers");
       throw new Error("Failed to retrieve peers");
     }
   }

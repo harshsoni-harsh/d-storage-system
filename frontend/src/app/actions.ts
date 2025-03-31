@@ -40,6 +40,8 @@ export async function uploadChunk(
 
     const data = await res.json();
 
+    console.log({data});
+
     if (!res.ok) {
       throw new Error(data.error || `Failed to upload chunk ${chunkIndex + 1}`);
     }

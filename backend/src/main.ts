@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module.js';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -14,7 +15,7 @@ async function bootstrap() {
   })
 
   await app.listen(port, () => {
-    console.log("Server started at ", port)
+    Logger.debug("Server started at " + port, "Main")
   });
 }
 bootstrap();

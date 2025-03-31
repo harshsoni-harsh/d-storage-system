@@ -1,3 +1,5 @@
 node_modules
 ipfs_data
 package-lock.json
+.env
+data/ipfs

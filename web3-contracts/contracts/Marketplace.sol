@@ -6,9 +6,10 @@ import "./Provider.sol";
 import "./Deal.sol";
 
 contract Marketplace {
+    address[] public providerList;
     mapping(address => address) public providers;
 
-    event ProviderRegistered(address indexed provider);
+    event ProviderRegistered(address indexed providerAddress, address indexed providerInstance);
     event DealCreated(address indexed userAddress, address indexed provider);
     event PaymentReleased(
         address indexed userAddress,
@@ -27,13 +28,15 @@ contract Marketplace {
     ) external {
         require(address(providers[msg.sender]) == address(0), "Already registered");
 
-        providers[msg.sender] = address(new Provider(
+        address providerInstance = address(new Provider(
             _pricePerKB,
             _sectorCount,
             _ipfsPeerId
         ));
+        providers[msg.sender] = providerInstance;
+        providerList.push(providerInstance);
 
-        emit ProviderRegistered(msg.sender);
+        emit ProviderRegistered(msg.sender, providerInstance);
     }
 
     function createDeal(

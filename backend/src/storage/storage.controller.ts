@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   StreamableFile,
+  Logger,
 } from "@nestjs/common";
 import { StorageService } from "./storage.service.js";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -51,21 +52,21 @@ export class StorageController {
     const filePath = path.join(this.storagePath, fileName);
 
     await fsPromises.appendFile(filePath, file.buffer);
-    console.debug(`Received chunk ${chunkIndex}/${totalChunks} for ${fileName}`);
+    Logger.debug(`Received chunk ${chunkIndex}/${totalChunks} for ${fileName}`);
 
     if (chunkIdx + 1 === totalChunksNum) {
-      console.log(`All chunks received. Storing ${fileName} in IPFS...`);
+      Logger.debug(`All chunks received. Storing ${fileName} in IPFS...`);
       try {
         const fileBuffer = await fsPromises.readFile(filePath);
         const cid = await this.storageService.storeFile(fileBuffer);
 
         // Remove temporary file after successful storage
         await fsPromises.unlink(filePath);
-        console.log(`File ${fileName} successfully stored with CID: ${cid}`);
+        Logger.debug(`File ${fileName} successfully stored with CID: ${cid}`);
 
-        return { message: "File upload complete", cid };
+        return ({ message: "File upload complete", cid });
       } catch (error) {
-        console.error("Error storing file:", error);
+        Logger.error("Error storing file:", error);
         throw new HttpException("Failed to store file", HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
@@ -79,16 +80,16 @@ export class StorageController {
       throw new HttpException("CID is required", HttpStatus.BAD_REQUEST);
     }
     try {
-      console.log(`Retrieving file with CID: ${cid}`);
+      Logger.debug(`Retrieving file with CID: ${cid}`);
       const fileBuffer = await this.storageService.retrieveFile(cid);
 
-      console.log(`Successfully retrieved file with CID: ${cid}`);
+      Logger.debug(`Successfully retrieved file with CID: ${cid}`);
       return new StreamableFile(fileBuffer, {
         disposition: 'attachment; filename="retrieved-file"',
         type: "application/octet-stream",
       });
     } catch (error) {
-      console.error("Error retrieving file:", error);
+      Logger.error("Error retrieving file:", error);
       throw new HttpException("File retrieval failed", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -97,7 +98,7 @@ export class StorageController {
     try {
       await fsPromises.mkdir(this.storagePath, { recursive: true });
     } catch (error) {
-      console.error("Error ensuring storage directory:", error);
+      Logger.error("Error ensuring storage directory:", error);
       throw new HttpException("Failed to create storage directory", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
