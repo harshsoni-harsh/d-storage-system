@@ -53,7 +53,10 @@
       "@biomejs/biome",
       "@ipshipyard/node-datachannel",
       "@nestjs/core",
-      "sharp"
+      "bufferutil",
+      "keccak",
+      "sharp",
+      "utf-8-validate"
     ],
     "patchedDependencies": {
       "connectkit": "patches/connectkit.patch"
