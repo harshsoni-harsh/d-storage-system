@@ -1,5 +1,5 @@
 'use client'
- import { fetchPeers } from "../actions";
+ import { fetchPeers } from "@/app/actions";
  import { useEffect, useMemo, useState } from 'react';
  import { ReactTable } from '@/components/ReactTable';
  import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

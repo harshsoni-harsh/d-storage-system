@@ -96,7 +96,7 @@ export default function Page() {
       price: provider.pricePerSector,
       duration: provider.validTill
     })) as PeerType[];
-    console.log(peers)
+    console.log({peers})
     // const peers = await Promise.all(providers?.map(async provider => {
     //   try {
     //     const response = await fetch(`${API_BASE_URL}/peers/?peerId=${provider.ipfsPeerId}`);

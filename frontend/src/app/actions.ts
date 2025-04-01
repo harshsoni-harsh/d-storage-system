@@ -40,7 +40,7 @@ export async function uploadChunk(
 
     const data = await res.json();
 
-    console.log({data});
+    console.log({ data });
 
     if (!res.ok) {
       throw new Error(data.error || `Failed to upload chunk ${chunkIndex + 1}`);
@@ -67,10 +67,10 @@ export async function connectPeer(addr: string) {
   const res = await fetch(`${API_BASE_URL}/peers`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      peerId: addr
+      peerId: addr,
     }),
   });
 
@@ -78,6 +78,17 @@ export async function connectPeer(addr: string) {
 
   if (!res.ok) {
     throw new Error(data.error || "Failed to connect peer");
+  } else {
+    return data;
+  }
+}
+
+export async function getIpfsAddress() {
+  const res = await fetch(`${API_BASE_URL}/ipfs`);
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to connect backend");
   } else {
     return data;
   }

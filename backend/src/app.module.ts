@@ -3,6 +3,7 @@ import { StorageModule } from './storage/storage.module.js';
 import { StorageService } from './storage/storage.service.js';
 import { ConfigModule } from '@nestjs/config';
 import { PeersModule } from './peers/peers.module.js';
+import { IPFSModule } from './ipfs/ipfs.module.js';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PeersModule } from './peers/peers.module.js';
       isGlobal: true,
     }),
     PeersModule,
+    IPFSModule
   ],
   providers: [StorageService]
 })

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { fetchCID, fetchPinnedFiles, uploadChunk } from "./actions";
+import { fetchCID, fetchPinnedFiles, uploadChunk } from "@/app/actions";
 import { getFileHash } from "@/lib/utils";
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB

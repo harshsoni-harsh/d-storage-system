@@ -16,7 +16,8 @@ import {
 import ThemeToggle from "./ThemeToggler";
 import { ConnectKitButton } from "connectkit";
 import { useTheme } from "next-themes";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const items = [
   {
@@ -39,16 +40,19 @@ const items = [
     url: "/deals",
     icon: CircuitBoard,
   },
-  {
-    title: "Onboarding",
-    url: "/onboarding",
-    icon: CircuitBoard,
-  },
 ];
 
 export function AppSidebar() {
   const { theme } = useTheme() as { theme: 'light' | 'dark' | undefined };
   const path = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (localStorage.getItem("isOnboardingDone") !== "true") {
+      router.push('/onboarding');
+    }
+  })
+
   return (
     <Sidebar className="max-w-48">
       <SidebarHeader className="mx-auto mt-2">
