@@ -24,16 +24,21 @@ export class PeersService implements OnModuleInit {
     }
   }
 
-  async findAll() {
-    try {
-      const peers = await this.ipfsClient.swarm.peers({
-        latency: true,
-      });
-      Logger.debug(`${peers?.length ?? 0} peers found`, "peers");
-      return peers;
-    } catch (error) {
-      Logger.error("Failed to fetch peers", error, "peers");
-      throw new Error("Failed to retrieve peers");
+  async findPeers(peerAddress: any) {
+    if (!peerAddress) {
+      try {
+        const peers = await this.ipfsClient.swarm.peers({
+          latency: true,
+        });
+        Logger.debug(`${peers?.length ?? 0} peers found`, "peers");
+        return peers;
+      } catch (error) {
+        Logger.error("Failed to fetch peers", error, "peers");
+        throw new Error("Failed to retrieve peers");
+      }
+    } else {
+      const peerInfo = this.ipfsClient.id({ peerId: peerAddress });
+      return peerInfo;
     }
   }
 }

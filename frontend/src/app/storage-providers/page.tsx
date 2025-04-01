@@ -12,7 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import  DealDialog from "@/components/ui/ConnectionDialogCreateDeal"
+import DealDialog from "@/components/ui/ConnectionDialogCreateDeal"
+import { getProviderDetails, getProviders } from '@/lib/contract-interactions';
+
 type PeerType = {
   addr: string;
   peer: string;
@@ -22,15 +24,26 @@ type PeerType = {
   duration: string;
 }
 
+type ProviderType = {
+  pricePerSector: string;
+  sectorCount: string;
+  validTill: string;
+  ipfsPeerId: string;
+}
+
 const intervals = [250, 500, 750, 1000, 2000, 5000];
 
+const API_BASE_URL = "http://localhost:3002";
+
 export default function Page() {
-  const [peers, setPeers] = useState<PeerType[]>([]); 
-  const [filteredPeers, setFilteredPeers] = useState<PeerType[]>([]); 
-  const [filterText, setFilterText] = useState<string>(''); 
-  const [syncInterval, setSyncInterval] = useState<number>(500); 
+  const [providers, setProviders] = useState<ProviderType[]>([]);
+  const [peers, setPeers] = useState<PeerType[]>([]);
+  const [filteredPeers, setFilteredPeers] = useState<PeerType[]>([]);
+  const [filterText, setFilterText] = useState<string>('');
+  const [syncInterval, setSyncInterval] = useState<number>(0);
 
   useEffect(() => {
+    syncProviders();
     syncPeers();
   }, []);
 
@@ -54,16 +67,47 @@ export default function Page() {
     )))
   }, [filterText]);
 
-  // Dummy data for peers
+  async function syncProviders() {
+    const providers = await getProviders();
+    console.log({providers})
+    if (Array.isArray(providers)) {
+      const providersDetails = await Promise.all(providers.map(async (provider) => {
+        return await getProviderDetails(provider);
+      })) as ProviderType[];
+      console.log({providersDetails})
+      setProviders(providersDetails);
+    }
+    await syncPeers();
+  }
   async function syncPeers() {
-    const dummyPeers: PeerType[] = [
-      { addr: '192.168.0.1', peer: 'Peer A', latency: '120ms', maxStorage: '500GB', price: '$10/month', duration: '12 months' },
-      { addr: '192.168.0.2', peer: 'Peer B', latency: '80ms', maxStorage: '1TB', price: '$20/month', duration: '6 months' },
-      { addr: '192.168.0.3', peer: 'Peer C', latency: '150ms', maxStorage: '200GB', price: '$8/month', duration: '24 months' },
-      { addr: '192.168.0.4', peer: 'Peer D', latency: '100ms', maxStorage: '2TB', price: '$30/month', duration: '18 months' },
-      { addr: '192.168.0.5', peer: 'Peer E', latency: '60ms', maxStorage: '5TB', price: '$50/month', duration: '36 months' },
-    ];
-    setPeers(dummyPeers);
+    // Dummy data for peers
+    // const dummyPeers: PeerType[] = [
+    //   { addr: '192.168.0.1', peer: 'Peer A', latency: '120ms', maxStorage: '500GB', price: '$10/month', duration: '12 months' },
+    //   { addr: '192.168.0.2', peer: 'Peer B', latency: '80ms', maxStorage: '1TB', price: '$20/month', duration: '6 months' },
+    //   { addr: '192.168.0.3', peer: 'Peer C', latency: '150ms', maxStorage: '200GB', price: '$8/month', duration: '24 months' },
+    //   { addr: '192.168.0.4', peer: 'Peer D', latency: '100ms', maxStorage: '2TB', price: '$30/month', duration: '18 months' },
+    //   { addr: '192.168.0.5', peer: 'Peer E', latency: '60ms', maxStorage: '5TB', price: '$50/month', duration: '36 months' },
+    // ];
+    const peers = providers.map(provider => ({
+      addr: '192.168.0.1',
+      peer: provider.ipfsPeerId,
+      latency: '100ms',
+      maxStorage: provider.sectorCount,
+      price: provider.pricePerSector,
+      duration: provider.validTill
+    })) as PeerType[];
+    console.log(peers)
+    // const peers = await Promise.all(providers?.map(async provider => {
+    //   try {
+    //     const response = await fetch(`${API_BASE_URL}/peers/?peerId=${provider.ipfsPeerId}`);
+    //     const info = await response.json();
+    //     return info;
+    //   } catch (err) {
+    //     console.error(err);
+    //     throw err;
+    //   }
+    // })) as PeerType[];
+    setPeers(peers);
   }
 
   const columns = useMemo(
@@ -120,7 +164,7 @@ export default function Page() {
     ],
     []
   );
-  
+
 
   const handleCreateDeal = (peer: string) => {
     alert(`Deal created with ${peer}`);

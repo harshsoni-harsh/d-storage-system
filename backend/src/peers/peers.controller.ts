@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { PeersService } from './peers.service.js';
 
 @Controller('peers')
@@ -12,7 +12,7 @@ export class PeersController {
   }
 
   @Get()
-  async findAll() {
-    return await this.peersService.findAll();
+  async findPeers(@Query("peerId") peerAddress: string) {
+    return await this.peersService.findPeers(peerAddress);
   }
 }

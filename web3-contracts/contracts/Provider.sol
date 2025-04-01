@@ -11,7 +11,7 @@ contract Provider {
     string public ipfsPeerId;
     bool public exists;
 
-    address[] deals;
+    address[] public deals;
     
     mapping(address => address) public dealsMapped;
     mapping(address => uint256) public reservedSectors;
@@ -29,6 +29,10 @@ contract Provider {
         validTill = 1 days;
         ipfsPeerId = _ipfsPeer;
         exists = true;
+    }
+
+    function getDeals() public view returns (address[] memory) {
+        return deals;
     }
 
     function updateData(
