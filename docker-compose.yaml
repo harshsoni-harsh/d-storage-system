@@ -12,10 +12,6 @@ services:
     privileged: true
     image: ipfs/kubo:latest
     user: "0:0"
-    ports:
-      - 5001:5001
-      - 4001:4001
-      - 8080:8080
     networks: 
       - d-storage-network
     volumes:
@@ -25,7 +21,6 @@ services:
   backend:
     privileged: true
     build: ./backend
-    container_name: d-storage-backend
     ports:
       - 3002:3002
     networks:
@@ -37,7 +32,6 @@ services:
   
   frontend:
     build: ./frontend
-    container_name: d-storage-frontend
     networks:
       - d-storage-network
     env_file:
@@ -45,3 +39,9 @@ services:
     ports:
       - 3000:3000
   
+  hardhat:
+    build: './web3-contracts'
+    networks:
+      - d-storage-network
+    ports:
+      - 8545:8545

@@ -1,0 +1,76 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start IPFS Daemon",
+        "type": "shell",
+        "command": "ipfs daemon",
+        "problemMatcher": [],
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "Start Backend Dev Server",
+        "type": "shell",
+        "command": "cd backend; pnpm dev",
+        "problemMatcher": [],
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "Start Frontend Dev Server",
+        "type": "shell",
+        "command": "cd frontend; pnpm dev",
+        "problemMatcher": [],
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "Start Hardhat Node",
+        "type": "shell",
+        "command": "cd web3-contracts; pnpm hardhat node",
+        "problemMatcher": [],
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "Deploy Smart Contract",
+        "type": "shell",
+        "command": "cd web3-contracts; pnpm hardhat ignition deploy ignition/modules/Marketplace.ts --network localhost",
+        "problemMatcher": [],
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+      },
+      {
+        "label": "Run D storage system",
+        "dependsOn": [
+          "Start IPFS Daemon",
+          "Start Backend Dev Server",
+          "Start Frontend Dev Server",
+          "Start Hardhat Node"
+        ],
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+  

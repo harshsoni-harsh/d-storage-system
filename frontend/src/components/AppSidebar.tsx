@@ -16,6 +16,7 @@ import {
 import ThemeToggle from "./ThemeToggler";
 import { ConnectKitButton } from "connectkit";
 import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
 
 const items = [
   {
@@ -47,6 +48,7 @@ const items = [
 
 export function AppSidebar() {
   const { theme } = useTheme() as { theme: 'light' | 'dark' | undefined };
+  const path = usePathname();
   return (
     <Sidebar className="max-w-48">
       <SidebarHeader className="mx-auto mt-2">
@@ -61,7 +63,7 @@ export function AppSidebar() {
                 return (
                   <SidebarMenuItem key={item.title}>
                     {trimmedUrl !== "" ? (
-                      <SidebarMenuButton asChild>
+                      <SidebarMenuButton asChild isActive={path === item.url}>
                         <Link href={trimmedUrl} className="flex items-center space-x-2">
                           <item.icon />
                           <span>{item.title}</span>

@@ -13,7 +13,7 @@ export default function Page() {
         if (Array.isArray(providers))
             providers.forEach(async (provider) => {
                 const deals = await fetchProviderDeals(provider);
-                setData((prev) => ({
+                setData((prev: any) => ({
                     ...prev,
                     [`${provider}-deals`]: deals,
                 }))
