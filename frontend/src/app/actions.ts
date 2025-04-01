@@ -93,3 +93,14 @@ export async function getIpfsAddress() {
     return data;
   }
 }
+
+export async function getPeerStats(peerId: string) {
+  const res = await fetch(`${API_BASE_URL}/peers?peerId=${peerId}`);
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to connect backend");
+  } else {
+    return data;
+  }
+}

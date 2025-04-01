@@ -65,12 +65,11 @@ export default function Onboarding() {
         BigInt(maxStorage),
         BigInt(price)
       );
+      localStorage.setItem("isOnboardingDone", "true");
+      router.replace("/");
     } catch (err) {
       console.log(err);
       showError("Error registering provider");
-    } finally {
-      localStorage.setItem("isOnboardingDone", "true");
-      router.replace("/");
     }
   }
 
@@ -104,7 +103,7 @@ export default function Onboarding() {
                     variant={role === option ? "default" : "outline"}
                     className={cn(
                       "px-8 py-3 text-lg font-bold",
-                      role === option ? 'bg-zinc-400' : ''
+                      role === option ? 'dark:bg-zinc-400' : ''
                     )}
                     onClick={() => handleSelection(option as "provider" | "user")}
                   >

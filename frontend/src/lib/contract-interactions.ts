@@ -2,6 +2,7 @@ import getWeb3 from "@/lib/web3";
 import { marketplaceABI, providerABI } from "@/lib/abi";
 import { getContract, isAddress, zeroAddress } from "viem";
 import { getAccount, publicClient, walletClient } from "./web3-clients";
+import { ProviderType } from "@/types/types";
 
 const MARKETPLACE_CONTRACT = process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT;
 
@@ -42,14 +43,15 @@ export async function getProviders() {
   }
 }
 
-export async function getProviderDetails(providerAddress: `0x${string}`) {
+export async function getProviderDetails(providerAddress: `0x${string}`): Promise<ProviderType> {
   try {
     const contract = getProviderContract(providerAddress);
-    const pricePerSector = await contract.read.pricePerSector();
-    const sectorCount = await contract.read.sectorCount();
-    const validTill = await contract.read.validTill();
-    const ipfsPeerId = await contract.read.ipfsPeerId();
+    const pricePerSector = await contract.read.pricePerSector() as string;
+    const sectorCount = await contract.read.sectorCount() as string;
+    const validTill = await contract.read.validTill() as string;
+    const ipfsPeerId = await contract.read.ipfsPeerId() as string;
     return {
+      providerAddress,
       pricePerSector,
       sectorCount,
       validTill,

@@ -273,6 +273,11 @@ export const providerABI = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_pricePerSector",
         "type": "uint256"
@@ -565,6 +570,19 @@ export const providerABI = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "walletAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

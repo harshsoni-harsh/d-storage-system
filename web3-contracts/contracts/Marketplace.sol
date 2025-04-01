@@ -33,6 +33,7 @@ contract Marketplace {
         require(address(providers[msg.sender]) == address(0), "Already registered");
 
         address providerInstance = address(new Provider(
+            msg.sender,
             _pricePerKB,
             _sectorCount,
             _ipfsPeerId

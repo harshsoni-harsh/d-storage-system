@@ -11,14 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
-type DealDialogProps = {
-    peer: string;
-    addr: string;  // Provider address
-    price: string; // Price from the row
-    onCreateDeal: (buyerAddr: string, providerAddr: string, price: string, duration: string, storageSize: string) => void;
-    text?: string; // Optional text prop for customization
-}
+import { DealDialogProps } from "@/types/types";
 
 export default function DealDialog({ peer, addr, price, onCreateDeal, text }: DealDialogProps) {
     const [duration, setDuration] = useState('');
@@ -35,9 +28,9 @@ export default function DealDialog({ peer, addr, price, onCreateDeal, text }: De
     // Validation check
     const isValid = integerRegex.test(duration) && numberRegex.test(storageSize);
 
-    const handleConfirmDeal = () => {
+    const handleCreateDeal = async () => {
         if (isValid) {
-            onCreateDeal(buyerAddr, addr, price, duration, storageSize);
+            await onCreateDeal({duration, storageSize});
             setIsDialogOpen(false); // Close dialog after deal creation
         }
     };
@@ -100,10 +93,10 @@ export default function DealDialog({ peer, addr, price, onCreateDeal, text }: De
                     <Button
                         variant={'outline'}
                         disabled={!isValid}
-                        onClick={handleConfirmDeal}
+                        onClick={handleCreateDeal}
                         className="text-white"
                     >
-                        Confirm Deal
+                        Create Deal
                     </Button>
                 </DialogFooter>
             </DialogContent>

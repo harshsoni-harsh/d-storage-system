@@ -13,23 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import DealDialog from "@/components/ui/ConnectionDialogCreateDeal"
-import { getProviderDetails, getProviders } from '@/lib/contract-interactions';
-
-type PeerType = {
-  addr: string;
-  peer: string;
-  latency: string;
-  maxStorage: string;
-  price: string;
-  duration: string;
-}
-
-type ProviderType = {
-  pricePerSector: string;
-  sectorCount: string;
-  validTill: string;
-  ipfsPeerId: string;
-}
+import { createDeal, getProviderDetails, getProviders } from '@/lib/contract-interactions';
+import { PeerType, ProviderType } from '@/types/types';
+import { getPeerStats } from '@/app/actions';
 
 const intervals = [250, 500, 750, 1000, 2000, 5000];
 
@@ -44,7 +30,6 @@ export default function Page() {
 
   useEffect(() => {
     syncProviders();
-    syncPeers();
   }, []);
 
   useEffect(() => {
@@ -69,44 +54,33 @@ export default function Page() {
 
   async function syncProviders() {
     const providers = await getProviders();
-    console.log({providers})
+    console.log({ providers })
     if (Array.isArray(providers)) {
       const providersDetails = await Promise.all(providers.map(async (provider) => {
         return await getProviderDetails(provider);
       })) as ProviderType[];
-      console.log({providersDetails})
+      console.log({ providersDetails })
       setProviders(providersDetails);
+      await syncPeers(providersDetails);
     }
-    await syncPeers();
   }
-  async function syncPeers() {
-    // Dummy data for peers
-    // const dummyPeers: PeerType[] = [
-    //   { addr: '192.168.0.1', peer: 'Peer A', latency: '120ms', maxStorage: '500GB', price: '$10/month', duration: '12 months' },
-    //   { addr: '192.168.0.2', peer: 'Peer B', latency: '80ms', maxStorage: '1TB', price: '$20/month', duration: '6 months' },
-    //   { addr: '192.168.0.3', peer: 'Peer C', latency: '150ms', maxStorage: '200GB', price: '$8/month', duration: '24 months' },
-    //   { addr: '192.168.0.4', peer: 'Peer D', latency: '100ms', maxStorage: '2TB', price: '$30/month', duration: '18 months' },
-    //   { addr: '192.168.0.5', peer: 'Peer E', latency: '60ms', maxStorage: '5TB', price: '$50/month', duration: '36 months' },
-    // ];
-    const peers = providers.map(provider => ({
-      addr: '192.168.0.1',
-      peer: provider.ipfsPeerId,
-      latency: '100ms',
-      maxStorage: provider.sectorCount,
-      price: provider.pricePerSector,
-      duration: provider.validTill
+  async function syncPeers(providersProp?: ProviderType[]) {
+    const providerData = providersProp ?? providers ?? [];
+    const peers = await Promise.all(providerData.map(async (provider) => {
+      const peerId = provider.ipfsPeerId.split('/').at(-1) ?? '';
+      const addr = provider.ipfsPeerId.split('/').at(2) ?? '';
+      const det = await getPeerStats(peerId);
+      console.log({det})
+      return ({
+        addr,
+        walletAddress: provider.providerAddress,
+        peer: peerId,
+        latency: '100ms',
+        maxStorage: provider.sectorCount,
+        price: provider.pricePerSector,
+        validTill: provider.validTill
+      })
     })) as PeerType[];
-    console.log({peers})
-    // const peers = await Promise.all(providers?.map(async provider => {
-    //   try {
-    //     const response = await fetch(`${API_BASE_URL}/peers/?peerId=${provider.ipfsPeerId}`);
-    //     const info = await response.json();
-    //     return info;
-    //   } catch (err) {
-    //     console.error(err);
-    //     throw err;
-    //   }
-    // })) as PeerType[];
     setPeers(peers);
   }
 
@@ -144,8 +118,8 @@ export default function Page() {
         accessorKey: 'price',
       },
       {
-        header: 'Duration',
-        accessorKey: 'duration',
+        header: 'Valid Till',
+        accessorKey: 'validTill',
       },
       {
         header: 'Action',
@@ -154,9 +128,8 @@ export default function Page() {
             peer={row.original.peer}
             addr={row.original.addr}
             price={row.original.price}
-            onCreateDeal={(peer, addr, price, duration, storageSize) => {
-              alert(`Deal Created with ${peer} at address ${addr} for ${price}, duration: ${duration}, storage: ${storageSize}`);
-              // Implement further logic for handling deal creation
+            onCreateDeal={async ({duration, storageSize}) => {
+              await createDeal(row.original.walletAddress, BigInt(storageSize), BigInt(duration));
             }}
           />
         ),
@@ -205,7 +178,7 @@ export default function Page() {
                 }
               </SelectContent>
             </Select>
-            <Button variant={'outline'} className="w-8 p-0" onClick={syncPeers}>
+            <Button variant={'outline'} className="w-8 p-0" onClick={() => syncPeers()}>
               <Image src='/icons/sync.svg' height={16} width={16} alt='Sync' className="dark:invert" />
             </Button>
           </div>

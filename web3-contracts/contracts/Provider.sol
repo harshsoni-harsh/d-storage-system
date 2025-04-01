@@ -5,6 +5,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import "./Deal.sol";
 
 contract Provider {
+    address public walletAddress;
     uint256 public pricePerSector;
     uint256 public sectorCount;
     uint256 public validTill;
@@ -20,10 +21,12 @@ contract Provider {
     event StorageReleased(address userAddress, uint256 sectorCount);
 
     constructor(
+        address _walletAddress,
         uint256 _pricePerSector,
         uint256 _sectorCount,
         string memory _ipfsPeer
     ) {
+        walletAddress = _walletAddress;
         pricePerSector = _pricePerSector;
         sectorCount = _sectorCount;
         validTill = 1 days;
