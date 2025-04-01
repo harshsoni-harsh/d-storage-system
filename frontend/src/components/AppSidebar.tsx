@@ -30,7 +30,17 @@ const items = [
   },
   {
     title: "Storage Providers",
-    url: "/",
+    url: "/storage-providers",
+    icon: CircuitBoard,
+  },
+  {
+    title: "Deals",
+    url: "/deals",
+    icon: CircuitBoard,
+  },
+  {
+    title: "Onboarding",
+    url: "/onboarding",
     icon: CircuitBoard,
   },
 ];
