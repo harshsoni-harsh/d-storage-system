@@ -13,9 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import DealDialog from "@/components/ui/ConnectionDialogCreateDeal"
-import { createDeal, getProviderDetails, getProviders } from '@/lib/contract-interactions';
+import { initiateDeal, getProviderDetails, getProviders } from '@/lib/contract-interactions';
 import { PeerType, ProviderType } from '@/types/types';
-import { getPeerStats } from '@/app/actions';
+import { getPeerLatency, getPeerStats } from '@/app/actions';
 
 const intervals = [250, 500, 750, 1000, 2000, 5000];
 
@@ -54,12 +54,10 @@ export default function Page() {
 
   async function syncProviders() {
     const providers = await getProviders();
-    console.log({ providers })
     if (Array.isArray(providers)) {
       const providersDetails = await Promise.all(providers.map(async (provider) => {
         return await getProviderDetails(provider);
       })) as ProviderType[];
-      console.log({ providersDetails })
       setProviders(providersDetails);
       await syncPeers(providersDetails);
     }
@@ -69,13 +67,12 @@ export default function Page() {
     const peers = await Promise.all(providerData.map(async (provider) => {
       const peerId = provider.ipfsPeerId.split('/').at(-1) ?? '';
       const addr = provider.ipfsPeerId.split('/').at(2) ?? '';
-      const det = await getPeerStats(peerId);
-      console.log({det})
+      const latency = await getPeerLatency(peerId);
       return ({
         addr,
         walletAddress: provider.providerAddress,
         peer: peerId,
-        latency: '100ms',
+        latency,
         maxStorage: provider.sectorCount,
         price: provider.pricePerSector,
         validTill: provider.validTill
@@ -112,14 +109,17 @@ export default function Page() {
       {
         header: 'Max Storage',
         accessorKey: 'maxStorage',
+        cell: ({ row }: { row: any }) => `${row.original.maxStorage} GB`
       },
       {
         header: 'Price',
         accessorKey: 'price',
+        cell: ({ row }: { row: any }) => `${row.original.price} ETH`,
       },
       {
         header: 'Valid Till',
         accessorKey: 'validTill',
+        cell: ({ row }: { row: any }) => `${new Date(Number(row.original.validTill) * 1000).toLocaleString()}`,
       },
       {
         header: 'Action',
@@ -129,7 +129,7 @@ export default function Page() {
             addr={row.original.addr}
             price={row.original.price}
             onCreateDeal={async ({duration, storageSize}) => {
-              await createDeal(row.original.walletAddress, BigInt(storageSize), BigInt(duration));
+              await initiateDeal(row.original.walletAddress, BigInt(storageSize), BigInt(duration));
             }}
           />
         ),

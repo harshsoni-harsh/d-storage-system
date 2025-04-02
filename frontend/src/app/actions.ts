@@ -104,3 +104,21 @@ export async function getPeerStats(peerId: string) {
     return data;
   }
 }
+
+export async function getPeerLatency(peerId: string) {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/peers/get-latency?peerId=${peerId}`
+    );
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to connect backend");
+    } else {
+      return data;
+    }
+  } catch (err) {
+    console.error(err);
+    return '-'
+  }
+}

@@ -1,8 +1,7 @@
-import getWeb3 from "@/lib/web3";
-import { marketplaceABI, providerABI } from "@/lib/abi";
-import { getContract, isAddress, zeroAddress } from "viem";
+import { dealABI, marketplaceABI, providerABI } from "@/lib/abi";
+import { getContract, isAddress } from "viem";
 import { getAccount, publicClient, walletClient } from "./web3-clients";
-import { ProviderType } from "@/types/types";
+import { AddressType, ProviderType } from "@/types/types";
 
 const MARKETPLACE_CONTRACT = process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT;
 
@@ -21,12 +20,23 @@ function getMarketplaceContract() {
   return contract;
 }
 
-function getProviderContract(PROVIDER_CONTRACT: `0x${string}`) {
+function getProviderContract(PROVIDER_CONTRACT: AddressType) {
   if (!PROVIDER_CONTRACT || !isAddress(PROVIDER_CONTRACT) || !walletClient)
     throw new Error("contract or walletClient not found");
   const contract = getContract({
     abi: providerABI,
     address: PROVIDER_CONTRACT,
+    client: { public: publicClient, wallet: walletClient },
+  });
+  return contract;
+}
+
+function getDealContract(DEAL_CONTRACT: AddressType) {
+  if (!DEAL_CONTRACT || !isAddress(DEAL_CONTRACT) || !walletClient)
+    throw new Error("contract or walletClient not found");
+  const contract = getContract({
+    abi: dealABI,
+    address: DEAL_CONTRACT,
     client: { public: publicClient, wallet: walletClient },
   });
   return contract;
@@ -43,15 +53,18 @@ export async function getProviders() {
   }
 }
 
-export async function getProviderDetails(providerAddress: `0x${string}`): Promise<ProviderType> {
+export async function getProviderDetails(
+  providerAddress: AddressType
+): Promise<ProviderType> {
   try {
     const contract = getProviderContract(providerAddress);
-    const pricePerSector = await contract.read.pricePerSector() as string;
-    const sectorCount = await contract.read.sectorCount() as string;
-    const validTill = await contract.read.validTill() as string;
-    const ipfsPeerId = await contract.read.ipfsPeerId() as string;
+    const walletAddress = (await contract.read.walletAddress()) as AddressType;
+    const pricePerSector = (await contract.read.pricePerSector()) as string;
+    const sectorCount = (await contract.read.sectorCount()) as string;
+    const validTill = (await contract.read.validTill()) as string;
+    const ipfsPeerId = (await contract.read.ipfsPeerId()) as string;
     return {
-      providerAddress,
+      providerAddress: walletAddress,
       pricePerSector,
       sectorCount,
       validTill,
@@ -92,17 +105,16 @@ export async function registerProvider(
   }
 }
 
-export async function createDeal(
-  providerAddress: `0x${string}`,
+export async function initiateDeal(
+  providerAddress: AddressType,
   fileSize: bigint,
   duration: bigint
 ) {
   try {
-    const providerContract = getProviderContract(providerAddress);
+    const marketplaceContract = getMarketplaceContract();
     const account = await getAccount();
-    console.log({ account });
-    const hash = await providerContract.write.createDeal(
-      [account, providerAddress, fileSize, duration],
+    const hash = await marketplaceContract.write.initiateDeal(
+      [providerAddress, fileSize, duration],
       { account }
     );
     console.log({ hash });
@@ -115,7 +127,7 @@ export async function createDeal(
       if (revertReason) {
         console.log("Revert Reason:", revertReason[1]);
       } else {
-        console.log("Revert Reason not found");
+        console.log("Revert Reason not found", err.message);
       }
     } else {
       throw new Error("Can't create deal with this provider", err);
@@ -123,23 +135,37 @@ export async function createDeal(
   }
 }
 
-export async function fetchProviderDeals(providerAddress: `0x${string}`) {
-  try {
-    const providerContract = getProviderContract(providerAddress);
-    const deals = await providerContract.read.getDeals();
+export async function fetchProviderDeals(providerAddress: AddressType) {
+  const providerContract = getProviderContract(providerAddress);
+  const deals = await providerContract.read.getDeals();
 
-    return deals;
-  } catch (err: any) {
-    if (err.message.includes("revert")) {
-      const revertReason = err.message.match(/revert (.+)/);
-      if (revertReason) {
-        console.log("Revert Reason:", revertReason[1]);
-      } else {
-        console.log("Revert Reason not found");
-      }
-    } else {
-      console.error(err);
-      throw new Error("Can't fetch deals for provider " + providerAddress);
-    }
-  }
+  return deals;
+}
+
+export async function fetchDealDetails(dealAddress: AddressType) {
+  const dealContract = getDealContract(dealAddress);
+  const pricePerSector = await dealContract.read.pricePerSector();
+  const sectorCount = await dealContract.read.sectorCount();
+  const validTill = await dealContract.read.validTill();
+  const isActive = await dealContract.read.isActive();
+  const isCompleted = await dealContract.read.completed();
+
+  return {
+    pricePerSector,
+    sectorCount,
+    validTill,
+    isActive,
+    isCompleted,
+  };
+}
+
+export async function approveDeal(userAddress: AddressType) {
+  const marketplaceContract = getMarketplaceContract();
+  const account = await getAccount();
+  const providerAddress = await marketplaceContract.read.provider_instances([account]) as AddressType;
+  
+  if (!providerAddress) throw new Error('User is not a provider');
+
+  const providerContract = getProviderContract(providerAddress);
+  await providerContract.write.approveDeal([userAddress]);
 }

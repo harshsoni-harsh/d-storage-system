@@ -41,4 +41,24 @@ export class PeersService implements OnModuleInit {
       return peerInfo;
     }
   }
+
+  async getLatency(peerAddress: string) {
+    try {
+      const pingResults = this.ipfsClient.ping(peerAddress);
+      for await (const res of pingResults) {
+        if (res.time) {
+          Logger.log(`Latency of ${peerAddress}: ${res.time} ms`)
+          return `${res.time} ms`;
+        } else if (!res.success) {
+          Logger.debug(`Ping failed: ${res.text}`);
+          throw new Error('Ping failed');
+        } else {
+          throw new Error('Ping failed');
+        }
+      }
+    } catch (error) {
+      Logger.error("Error measuring latency:", error);
+      throw error;
+    }
+  }
 }

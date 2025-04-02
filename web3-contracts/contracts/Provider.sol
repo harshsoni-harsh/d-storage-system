@@ -30,7 +30,7 @@ contract Provider {
         walletAddress = _walletAddress;
         pricePerSector = _pricePerSector;
         sectorCount = _sectorCount;
-        validTill = 1 days;
+        validTill = block.timestamp + 1 days;
         ipfsPeerId = _ipfsPeer;
         exists = true;
         marketplace = msg.sender;

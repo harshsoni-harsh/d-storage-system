@@ -10,7 +10,7 @@ contract Marketplace {
     address[] providerList;
 
     // providerAddress -> providerInstance
-    mapping(address => address) provider_instances;
+    mapping(address => address) public provider_instances;
 
     // userAddress -> providerInstances[]
     mapping(address => address[]) user_providers;
@@ -55,7 +55,7 @@ contract Marketplace {
         uint256 _sectorCount,
         uint256 _duration
     ) external payable {
-        require(address(provider_instances[msg.sender]) != address(0), "Provider cannot initiate a deal.");
+        require(address(provider_instances[msg.sender]) == address(0), "Provider cannot initiate a deal.");
         Provider provider = Provider(provider_instances[_provider]);
         
         uint256 sectorCount = _sectorCount;

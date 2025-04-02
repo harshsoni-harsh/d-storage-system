@@ -58,29 +58,6 @@ export const marketplaceABI = [
     "type": "event"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_provider",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_fileSize",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_duration",
-        "type": "uint256"
-      }
-    ],
-    "name": "createDeal",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "getProviderList",
     "outputs": [
@@ -97,11 +74,34 @@ export const marketplaceABI = [
     "inputs": [
       {
         "internalType": "address",
+        "name": "_provider",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_sectorCount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_duration",
+        "type": "uint256"
+      }
+    ],
+    "name": "initiateDeal",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
     ],
-    "name": "providers",
+    "name": "provider_instances",
     "outputs": [
       {
         "internalType": "address",
@@ -126,7 +126,7 @@ export const marketplaceABI = [
       },
       {
         "internalType": "uint256",
-        "name": "_pricePerKB",
+        "name": "_pricePerSector",
         "type": "uint256"
       }
     ],
@@ -177,10 +177,22 @@ export const dealABI = [
         "internalType": "uint256",
         "name": "_validTill",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_marketplaceAddress",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "activateDeal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -192,6 +204,19 @@ export const dealABI = [
   {
     "inputs": [],
     "name": "completed",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "isActive",
     "outputs": [
       {
         "internalType": "bool",
@@ -223,6 +248,19 @@ export const dealABI = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "providerAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -340,26 +378,11 @@ export const providerABI = [
         "internalType": "address",
         "name": "_userAddress",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_pricePerSector",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_validTill",
-        "type": "uint256"
       }
     ],
-    "name": "createDeal",
+    "name": "approveDeal",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -392,9 +415,9 @@ export const providerABI = [
     "name": "dealsMapped",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -427,6 +450,34 @@ export const providerABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_userAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_pricePerSector",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_sectorCount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_validTill",
+        "type": "uint256"
+      }
+    ],
+    "name": "initiateDeal",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "ipfsPeerId",
     "outputs": [
@@ -443,7 +494,7 @@ export const providerABI = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "userAddress",
+        "name": "_userAddress",
         "type": "address"
       }
     ],

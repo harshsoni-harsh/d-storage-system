@@ -15,4 +15,9 @@ export class PeersController {
   async findPeers(@Query("peerId") peerAddress: string) {
     return await this.peersService.findPeers(peerAddress);
   }
+
+  @Get('get-latency')
+  async getLatency(@Query("peerId") peerAddress: string) {
+    return await this.peersService.getLatency(peerAddress);
+  }
 }

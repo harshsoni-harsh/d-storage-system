@@ -1,3 +1,5 @@
+export type AddressType = `0x${string}`;
+
 export type PeerType = {
   addr: string;
   peer: string;
@@ -5,11 +7,11 @@ export type PeerType = {
   maxStorage: string;
   price: string;
   validTill: string;
-  walletAddress: `0x${string}`;
+  walletAddress: AddressType;
 };
 
 export type ProviderType = {
-  providerAddress: `0x${string}`;
+  providerAddress: AddressType;
   pricePerSector: string;
   sectorCount: string;
   validTill: string;
