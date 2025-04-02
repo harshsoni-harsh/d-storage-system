@@ -56,7 +56,7 @@ export function AppSidebar() {
   return (
     <Sidebar className="max-w-48">
       <SidebarHeader className="mx-auto mt-2">
-        <ConnectKitButton mode={theme}  />
+        <ConnectKitButton mode={theme} />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -88,6 +88,9 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="mx-2 mb-2">
         <ThemeToggle />
+        <Link href='/onboarding'>
+          <SidebarMenuButton>Go to Onboarding</SidebarMenuButton>
+        </Link>
       </SidebarFooter>
     </Sidebar>
   );
