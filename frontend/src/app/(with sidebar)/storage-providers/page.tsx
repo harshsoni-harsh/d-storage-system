@@ -103,8 +103,8 @@ export default function Page() {
         cell: ({ row }: { row: any }) => `${row.original.latency}`,
       },
       {
-        header: 'Provider ID',
-        accessorKey: 'peer',
+        header: 'Provider Wallet',
+        accessorKey: 'walletAddress',
       },
       {
         header: 'Max Storage',
@@ -128,8 +128,8 @@ export default function Page() {
             peer={row.original.peer}
             addr={row.original.addr}
             price={row.original.price}
-            onCreateDeal={async ({duration, storageSize}) => {
-              await initiateDeal(row.original.walletAddress, BigInt(storageSize), BigInt(duration));
+            onCreateDeal={async ({duration, storageSize}: {duration: number, storageSize: number}) => {
+              await initiateDeal(row.original.walletAddress, storageSize, duration, storageSize * Number(row.original.price));
             }}
           />
         ),

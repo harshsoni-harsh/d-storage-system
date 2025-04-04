@@ -1,5 +1,5 @@
 import { dealABI, marketplaceABI, providerABI } from "@/lib/abi";
-import { getContract, isAddress } from "viem";
+import { getContract, isAddress, parseEther } from "viem";
 import { getAccount, publicClient, walletClient } from "./web3-clients";
 import { AddressType, ProviderType } from "@/types/types";
 
@@ -45,7 +45,7 @@ function getDealContract(DEAL_CONTRACT: AddressType) {
 export async function getProviders() {
   try {
     const contract = getMarketplaceContract();
-    const providerList = await contract.read.getProviderList();
+    const providerList = await contract.read.getAllProviders();
     return providerList;
   } catch (err) {
     console.error(err instanceof Error ? err.message : err);
@@ -107,15 +107,19 @@ export async function registerProvider(
 
 export async function initiateDeal(
   providerAddress: AddressType,
-  fileSize: bigint,
-  duration: bigint
+  fileSize: number,
+  duration: number,
+  amount: number
 ) {
   try {
     const marketplaceContract = getMarketplaceContract();
     const account = await getAccount();
     const hash = await marketplaceContract.write.initiateDeal(
       [providerAddress, fileSize, duration],
-      { account }
+      { 
+        account,
+        value: parseEther(amount.toString())
+      },
     );
     console.log({ hash });
     const receipt = await publicClient.waitForTransactionReceipt({ hash });

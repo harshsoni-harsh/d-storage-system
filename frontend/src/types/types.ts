@@ -26,8 +26,8 @@ export type DealDialogProps = {
     duration,
     storageSize,
   }: {
-    duration: string;
-    storageSize: string;
+    duration: number;
+    storageSize: number;
   }) => Promise<void>;
   text?: string;
 };

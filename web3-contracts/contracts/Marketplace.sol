@@ -4,16 +4,17 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import "./Provider.sol";
 import "./Deal.sol";
+import "hardhat/console.sol";
 
 contract Marketplace {
     // providerInstance[]
-    address[] providerList;
+    address[] public providerList;
 
     // providerAddress -> providerInstance
     mapping(address => address) public provider_instances;
 
-    // userAddress -> providerInstances[]
-    mapping(address => address[]) user_providers;
+    // userAddress -> provider -> bool
+    mapping(address => mapping(address => bool)) private user_deals;
 
     event ProviderRegistered(address indexed providerAddress, address indexed providerInstance);
     event DealCreated(address indexed userAddress, address indexed provider);
@@ -27,7 +28,7 @@ contract Marketplace {
         _;
     }
 
-    function getProviderList() public view returns (address[] memory) {
+    function getAllProviders() external view returns (address[] memory) {
         return providerList;
     }
 
@@ -55,35 +56,36 @@ contract Marketplace {
         uint256 _sectorCount,
         uint256 _duration
     ) external payable {
-        require(address(provider_instances[msg.sender]) == address(0), "Provider cannot initiate a deal.");
+        require(provider_instances[msg.sender] == address(0), "Provider cannot initiate a deal.");
+        require(!user_deals[msg.sender][_provider], "Deal already exists with this provider.");
         Provider provider = Provider(provider_instances[_provider]);
         
-        uint256 sectorCount = _sectorCount;
         uint256 validTill = block.timestamp + _duration;
-        uint256 requiredPayment = sectorCount * provider.pricePerSector();
+        uint256 requiredPayment = _sectorCount * provider.pricePerSector();
 
-        require(msg.value == requiredPayment, "Incorrect payment amount");
+        require(msg.value >= requiredPayment, string(abi.encodePacked("Incorrect payment amount. Required payment is ", requiredPayment)));
         require(
-            sectorCount <= provider.sectorCount(),
+            _sectorCount <= provider.sectorCount(),
             "Insufficient provider storage"
         );
 
         provider.initiateDeal(
             msg.sender,
             provider.pricePerSector(),
-            sectorCount,
+            _sectorCount,
             validTill
         );
 
-        provider.reserveSectors(msg.sender, sectorCount);
+        user_deals[msg.sender][_provider] = true;
+
+        provider.reserveSectors(msg.sender, _sectorCount);
 
         emit DealCreated(msg.sender, _provider);
     }
 
     function releasePayment(address _providerAddress, address _userAddress) external {
         Provider provider = Provider(provider_instances[_providerAddress]);
-        uint256 dealIdx = provider.dealsMapped(_userAddress);
-        address dealAddress = provider.deals(dealIdx);
+        address dealAddress = provider.dealsMapped(_userAddress);
         Deal deal = Deal(dealAddress);
 
         require(deal.isActive(), "Deal not active yet!");

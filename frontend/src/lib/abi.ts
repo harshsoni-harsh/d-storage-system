@@ -59,7 +59,7 @@ export const marketplaceABI = [
   },
   {
     "inputs": [],
-    "name": "getProviderList",
+    "name": "getAllProviders",
     "outputs": [
       {
         "internalType": "address[]",
@@ -91,6 +91,25 @@ export const marketplaceABI = [
     "name": "initiateDeal",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "providerList",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -386,6 +405,19 @@ export const providerABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "dealCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -415,9 +447,9 @@ export const providerABI = [
     "name": "dealsMapped",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "address",
         "name": "",
-        "type": "uint256"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -438,7 +470,7 @@ export const providerABI = [
   },
   {
     "inputs": [],
-    "name": "getDeals",
+    "name": "getAllDeals",
     "outputs": [
       {
         "internalType": "address[]",
@@ -473,7 +505,13 @@ export const providerABI = [
       }
     ],
     "name": "initiateDeal",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "payable",
     "type": "function"
   },

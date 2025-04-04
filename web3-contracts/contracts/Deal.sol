@@ -29,13 +29,14 @@ contract Deal {
 
     function activateDeal() public {
         require(msg.sender == providerAddress, "Only provider can approve the deal");
-        require(isActive == true, "Deal is already active");
+        require(isActive != true, "Deal is already active");
         isActive = true;
     }
 
     function completeDeal() external {
         require(msg.sender == marketplace, "Only marketplace can call the deal");
         require(block.timestamp >= validTill, "Deal duration not ended");
+        require(completed != true, "Deal is already completed");
         completed = true;
     }
 }

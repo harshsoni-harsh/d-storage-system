@@ -13,9 +13,11 @@ contract Provider {
     bool public exists;
     address marketplace;
 
+    uint256 public dealCount;
+
     address[] public deals;
     
-    mapping(address => uint256) public dealsMapped;
+    mapping(address => address) public dealsMapped;
     mapping(address => uint256) public reservedSectors;
 
     event StorageReserved(address userAddress, uint256 sectorCount);
@@ -36,7 +38,7 @@ contract Provider {
         marketplace = msg.sender;
     }
 
-    function getDeals() public view returns (address[] memory) {
+    function getAllDeals() external view returns (address[] memory) {
         return deals;
     }
 
@@ -56,10 +58,9 @@ contract Provider {
         uint256 _pricePerSector,
         uint256 _sectorCount,
         uint256 _validTill
-    ) public payable {
+    ) public payable returns (address) {
         require(msg.sender == marketplace, "Only marketplace can initiate the deal");
-        uint256 dealIdx = dealsMapped[_userAddress];
-        require(dealIdx == 0 && address(deals[dealIdx]) == address(0), "A deal already exists");
+        require(address(dealsMapped[_userAddress]) == address(0), "A deal already exists");
         Deal deal = new Deal(
             _userAddress,
             _pricePerSector,
@@ -67,15 +68,15 @@ contract Provider {
             _validTill,
             marketplace
         );
-        dealsMapped[_userAddress] = deals.length;
+        dealsMapped[_userAddress] = address(deal);
         deals.push(address(deal));
+        return address(deal);
     }
 
     function approveDeal(
         address _userAddress
     ) external payable {
-        uint256 dealIdx = dealsMapped[_userAddress];
-        address dealAddress = deals[dealIdx];
+        address dealAddress = dealsMapped[_userAddress];
         
         require(dealAddress != address(0), "Deal doesn't exists");
         require(msg.sender == walletAddress, "Only provider can approve the deal");
@@ -87,8 +88,7 @@ contract Provider {
     }
 
     function isDealActive(address _userAddress) public view returns (bool) {
-        uint256 dealIdx = dealsMapped[_userAddress];
-        address dealAddress = deals[dealIdx];
+        address dealAddress = dealsMapped[_userAddress];
 
         require(dealAddress != address(0), "Deal does not exist");
 
@@ -99,7 +99,7 @@ contract Provider {
         require(_sectorCount <= sectorCount, "Not enough sectors");
 
         sectorCount -= _sectorCount;
-        reservedSectors[userAddress] = _sectorCount;
+        reservedSectors[userAddress] += _sectorCount;
         emit StorageReserved(userAddress, _sectorCount);
     }
 

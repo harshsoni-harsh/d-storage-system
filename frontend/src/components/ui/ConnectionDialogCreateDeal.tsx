@@ -14,22 +14,15 @@ import { Input } from "@/components/ui/input"
 import { DealDialogProps } from "@/types/types";
 
 export default function DealDialog({ peer, addr, price, onCreateDeal, text }: DealDialogProps) {
-    const [duration, setDuration] = useState('');
-    const [storageSize, setStorageSize] = useState('');
+    const [duration, setDuration] = useState(0);
+    const [storageSize, setStorageSize] = useState(0);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // Dummy buyer address (common for all)
     const buyerAddr = "QmVtZXN0ZXJzUG9vcnQxMjM=";
 
-    // Regex patterns
-    const numberRegex = /^\d+(\.\d{1,2})?$/; // Integer or float (up to 2 decimals)
-    const integerRegex = /^\d+$/; // Strict integer
-
-    // Validation check
-    const isValid = integerRegex.test(duration) && numberRegex.test(storageSize);
-
     const handleCreateDeal = async () => {
-        if (isValid) {
+        if (storageSize !== 0 && duration !== 0) {
             await onCreateDeal({duration, storageSize});
             setIsDialogOpen(false); // Close dialog after deal creation
         }
@@ -63,36 +56,29 @@ export default function DealDialog({ peer, addr, price, onCreateDeal, text }: De
                         <label htmlFor="storage-size" className="block text-sm font-medium text-gray-300">Storage Size (GB)</label>
                         <Input
                             id="storage-size"
-                            type="text"
+                            type="number"
                             value={storageSize}
-                            onChange={(e) => setStorageSize(e.target.value)}
+                            onChange={(e) => setStorageSize(parseInt(e.target.value))}
                             placeholder="Enter storage size (e.g. 10 or 10.50)"
                             className="mt-1"
                         />
-                        {!numberRegex.test(storageSize) && storageSize !== '' && (
-                            <p className="text-red-500 text-sm">Must be an integer or a number with up to 2 decimals</p>
-                        )}
                     </div>
 
                     <div>
                         <label htmlFor="duration" className="block text-sm font-medium text-gray-300">Duration (Days)</label>
                         <Input
                             id="duration"
-                            type="text"
+                            type="number"
                             value={duration}
-                            onChange={(e) => setDuration(e.target.value)}
+                            onChange={(e) => setDuration(parseInt(e.target.value))}
                             placeholder="Enter duration in days (e.g. 30)"
                             className="mt-1"
                         />
-                        {!integerRegex.test(duration) && duration !== '' && (
-                            <p className="text-red-500 text-sm">Must be a valid integer</p>
-                        )}
                     </div>
                 </div>
                 <DialogFooter>
                     <Button
                         variant={'outline'}
-                        disabled={!isValid}
                         onClick={handleCreateDeal}
                         className="text-white"
                     >
