@@ -4,17 +4,10 @@ import { ReactTable } from '@/components/ReactTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";  
+import Image from "next/image";
 
-type ProviderDealType = {
-  addr: string;
-  status: 'Active' | 'Cancelled' | 'Completed' | 'Waiting for Approval';
-  price: number;
-  remainingStorage?: number;
-  remainingDuration?: string;
-  timestamp: string;
-  cancelReason?: string;
-};
+import { fetchProviderDeals, fetchDealDetails, getProviders, approveDeal } from '@/lib/contract-interactions';
+import { AddressType, ProviderDealType } from '@/types/types';
 
 export default function ProviderDeals() {
   const [deals, setDeals] = useState<ProviderDealType[]>([]);
@@ -37,34 +30,55 @@ export default function ProviderDeals() {
   }, [filterText, deals]);
 
   async function syncDeals() {
-    const dummyDeals: ProviderDealType[] = [
-      { addr: '0x123aladkaljdkajdabc', status: 'Active', price: 15.5, remainingStorage: 100, remainingDuration: '30 days', timestamp: '2024-04-01 12:00:00' },
-      { addr: '0x456...def', status: 'Cancelled', price: 10, timestamp: '2024-03-28 10:30:00', cancelReason: 'Provider unresponsive' },
-      { addr: '0x789...ghi', status: 'Completed', price: 20, timestamp: '2024-02-20 08:15:00' },
-      { addr: '0x321...jkl', status: 'Waiting for Approval', price: 25, timestamp: '2024-03-20 12:00:00', cancelReason: 'Pending review' },
-      { addr: '0xAAA111BBB222CCC333', status: 'Active', price: 18, remainingStorage: 200, remainingDuration: '45 days', timestamp: '2024-04-05 14:20:00' },
-      { addr: '0xDDD444EEE555FFF666', status: 'Cancelled', price: 12, timestamp: '2024-03-15 09:00:00', cancelReason: 'Insufficient funds' },
-      { addr: '0xGGG777HHH888III999', status: 'Completed', price: 22, timestamp: '2024-01-30 16:45:00' },
-      { addr: '0xJJJ000KKK111LLL222', status: 'Waiting for Approval', price: 30, remainingStorage: 150, remainingDuration: '60 days', timestamp: '2024-04-10 11:30:00' },
-    ];
-    setDeals(dummyDeals);
+    try {
+      const providers = await getProviders();
+      const deals = await Promise.all(providers.map(async provider => {
+        const deals = await fetchProviderDeals(provider) as AddressType[];
+        return await Promise.all(
+          deals.map(async (dealAddress: AddressType) : Promise<ProviderDealType> => { 
+            const details = await fetchDealDetails(dealAddress);
+    
+            let status: ProviderDealType['status'] = 'Active';
+            if (details.isCompleted) status = 'Completed';
+            else if (!details.isActive) status = 'Waiting for Approval';
+            
+            return ({
+              addr: dealAddress,
+              status,
+              price: Number(details.pricePerSector),
+              remainingStorage: Number(details.sectorCount),
+              validTill: Number(details.validTill)
+            } as ProviderDealType);
+          })
+        ) as ProviderDealType[];
+      }));
+      const dealsData = deals.flat();
+      
+      setDeals(dealsData);
+    } catch (error) {
+      console.error('Error syncing deals:', error);
+  
+    }
   }
 
-  function handleConfirmDeal(addr: string) {
+  async function handleConfirmDeal(dealAddress: AddressType) {
+  try {
+    await approveDeal(dealAddress);
     setDeals(prevDeals =>
-      prevDeals.map(deal => 
-        deal.addr === addr ? { ...deal, status: 'Active' } : deal
+      prevDeals.map(deal =>
+        deal.addr === dealAddress
+          ? { ...deal, status: 'Active' }
+          : deal
       )
     );
+  } catch (error) {
+    console.error(`Failed to confirm deal ${dealAddress}:`, error);
   }
+}
 
-  function handleCancelDeal(addr: string) {
-    setDeals(prevDeals =>
-      prevDeals.map(deal => 
-        deal.addr === addr ? { ...deal, status: 'Cancelled', cancelReason: reasonMap[addr] || '' } : deal
-      )
-    );
-  }
+async function handleCancelDeal(dealAddress: AddressType){
+  
+}
 
   const columns = useMemo(
     () => [
@@ -92,13 +106,15 @@ export default function ProviderDeals() {
       { header: 'Price ($)', accessorKey: 'price' },
       {
         header: 'Remaining Storage (GB)',
-        accessorFn: (row: ProviderDealType) => (row.status === 'Active' ? row.remainingStorage ?? 'N/A' : 'N/A'),
-      },
+        accessorFn: (row: ProviderDealType) => row.remainingStorage ?? 'N/A',
+      },      
       {
-        header: 'Remaining Duration',
-        accessorFn: (row: ProviderDealType) => (row.status === 'Active' ? row.remainingDuration ?? 'N/A' : 'N/A'),
+        header: 'Valid Till',
+        accessorFn: (row: ProviderDealType) => {
+          const date = new Date(row.validTill * 1000);
+          return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+        },
       },
-      { header: 'Timestamp', accessorKey: 'timestamp' },
       {
         header: 'Reason',
         cell: ({ row }: { row: any }) => {

@@ -5,7 +5,7 @@ import { mainnet, hardhat } from 'viem/chains'
  
 export const publicClient = createPublicClient({
   chain: hardhat,
-  transport: http(),
+  transport: http(process.env.NEXT_PUBLIC_HARDHAT_RPC_URL ?? ''),
 })
 
 const isEthereumAvailable = typeof window !== 'undefined' && typeof window.ethereum !== 'undefined';
