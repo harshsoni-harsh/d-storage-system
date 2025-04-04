@@ -42,6 +42,13 @@ contract Provider {
         return deals;
     }
 
+    function getProviderInfo() external view returns (
+        address, uint256, uint256, uint256, string memory
+    ) {
+        return (walletAddress, pricePerSector, sectorCount, validTill, ipfsPeerId);
+    }
+
+
     function updateData(
         uint256 newPrice,
         uint256 time,

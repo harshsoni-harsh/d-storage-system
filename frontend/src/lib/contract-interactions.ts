@@ -58,11 +58,15 @@ export async function getProviderDetails(
 ): Promise<ProviderType> {
   try {
     const contract = getProviderContract(providerAddress);
-    const walletAddress = (await contract.read.walletAddress()) as AddressType;
-    const pricePerSector = (await contract.read.pricePerSector()) as string;
-    const sectorCount = (await contract.read.sectorCount()) as string;
-    const validTill = (await contract.read.validTill()) as string;
-    const ipfsPeerId = (await contract.read.ipfsPeerId()) as string;
+    const [walletAddress, pricePerSector, sectorCount, validTill, ipfsPeerId] =
+      (await contract.read.getProviderInfo()) as [
+        AddressType,
+        string,
+        string,
+        string,
+        string
+      ];
+
     return {
       providerAddress: walletAddress,
       pricePerSector,
@@ -116,10 +120,10 @@ export async function initiateDeal(
     const account = await getAccount();
     const hash = await marketplaceContract.write.initiateDeal(
       [providerAddress, fileSize, duration],
-      { 
+      {
         account,
-        value: parseEther(amount.toString())
-      },
+        value: parseEther(amount.toString()),
+      }
     );
     console.log({ hash });
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
@@ -173,9 +177,11 @@ export async function fetchDealDetails(dealAddress: AddressType) {
 export async function approveDeal(userAddress: AddressType) {
   const marketplaceContract = getMarketplaceContract();
   const account = await getAccount();
-  const providerAddress = await marketplaceContract.read.provider_instances([account]) as AddressType;
-  
-  if (!providerAddress) throw new Error('User is not a provider');
+  const providerAddress = (await marketplaceContract.read.provider_instances([
+    account,
+  ])) as AddressType;
+
+  if (!providerAddress) throw new Error("User is not a provider");
 
   const providerContract = getProviderContract(providerAddress);
   await providerContract.write.approveDeal([userAddress]);
