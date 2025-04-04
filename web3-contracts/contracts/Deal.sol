@@ -39,4 +39,14 @@ contract Deal {
         require(completed != true, "Deal is already completed");
         completed = true;
     }
+
+    function getDealInfo() external view returns (
+        uint256 _pricePerSector,
+        uint256 _sectorCount,
+        uint256 _validTill,
+        bool _isActive,
+        bool _completed
+    ) {
+        return (pricePerSector, sectorCount, validTill, isActive, completed);
+    }
 }

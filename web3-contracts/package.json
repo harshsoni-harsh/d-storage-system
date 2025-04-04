@@ -1,7 +1,7 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "update-abi": "bun run scripts/update-abi.ts",
+    "update-abi": "pnpm hardhat compile && bun run scripts/update-abi.ts",
     "deploy": "bun run scripts/deployWithAbi.ts"
   },
   "devDependencies": {
