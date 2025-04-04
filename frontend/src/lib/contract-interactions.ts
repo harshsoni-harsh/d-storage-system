@@ -153,18 +153,15 @@ export async function fetchUserDeals() {
 
 export async function fetchDealDetails(dealAddress: AddressType) {
   const dealContract = getDealContract(dealAddress);
-  const pricePerSector = await dealContract.read.pricePerSector();
-  const sectorCount = await dealContract.read.sectorCount();
-  const validTill = await dealContract.read.validTill();
-  const isActive = await dealContract.read.isActive();
-  const isCompleted = await dealContract.read.completed();
+  
+  const [pricePerSector, sectorCount, validTill, isActive, completed] = await dealContract.read.getDealInfo();
 
   return {
     pricePerSector,
     sectorCount,
     validTill,
     isActive,
-    isCompleted,
+    completed,
   };
 }
 

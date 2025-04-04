@@ -1,17 +1,18 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "update-abi": "pnpm hardhat compile && bun run scripts/update-abi.ts",
-    "deploy": "bun run scripts/deployWithAbi.ts"
-  },
-  "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.19"
+    "update-abi": "bun run scripts/update-abi.ts",
+    "deploy": "pnpm hardhat compile && bun run scripts/deployWithAbi.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "keccak",
       "secp256k1"
     ]
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-ignition": "^0.15.10",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.19"
   }
 }

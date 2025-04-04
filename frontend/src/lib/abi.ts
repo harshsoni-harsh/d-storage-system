@@ -61,6 +61,39 @@ export const DealABI = [
   },
   {
     "inputs": [],
+    "name": "getDealInfo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_pricePerSector",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_sectorCount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_validTill",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isActive",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "_completed",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "isActive",
     "outputs": [
       {
