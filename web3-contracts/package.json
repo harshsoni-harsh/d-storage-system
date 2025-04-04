@@ -1,5 +1,9 @@
 {
   "name": "hardhat-project",
+  "scripts": {
+    "update-abi": "bun run scripts/update-abi.ts",
+    "deploy": "bun run scripts/deployWithAbi.ts"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.22.19"

@@ -1,4 +1,4 @@
-import { dealABI, marketplaceABI, providerABI } from "@/lib/abi";
+import { DealABI, MarketplaceABI, ProviderABI } from "@/lib/abi";
 import { getContract, isAddress, parseEther } from "viem";
 import { getAccount, publicClient, walletClient } from "./web3-clients";
 import { AddressType, ProviderType } from "@/types/types";
@@ -13,7 +13,7 @@ function getMarketplaceContract() {
   )
     throw new Error("contract or walletClient not found");
   const contract = getContract({
-    abi: marketplaceABI,
+    abi: MarketplaceABI,
     address: MARKETPLACE_CONTRACT,
     client: { public: publicClient, wallet: walletClient },
   });
@@ -24,7 +24,7 @@ function getProviderContract(PROVIDER_CONTRACT: AddressType) {
   if (!PROVIDER_CONTRACT || !isAddress(PROVIDER_CONTRACT) || !walletClient)
     throw new Error("contract or walletClient not found");
   const contract = getContract({
-    abi: providerABI,
+    abi: ProviderABI,
     address: PROVIDER_CONTRACT,
     client: { public: publicClient, wallet: walletClient },
   });
@@ -35,7 +35,7 @@ function getDealContract(DEAL_CONTRACT: AddressType) {
   if (!DEAL_CONTRACT || !isAddress(DEAL_CONTRACT) || !walletClient)
     throw new Error("contract or walletClient not found");
   const contract = getContract({
-    abi: dealABI,
+    abi: DealABI,
     address: DEAL_CONTRACT,
     client: { public: publicClient, wallet: walletClient },
   });
@@ -59,19 +59,13 @@ export async function getProviderDetails(
   try {
     const contract = getProviderContract(providerAddress);
     const [walletAddress, pricePerSector, sectorCount, validTill, ipfsPeerId] =
-      (await contract.read.getProviderInfo()) as [
-        AddressType,
-        string,
-        string,
-        string,
-        string
-      ];
+      (await contract.read.getProviderInfo());
 
     return {
       providerAddress: walletAddress,
-      pricePerSector,
-      sectorCount,
-      validTill,
+      pricePerSector: Number(pricePerSector).toString(),
+      sectorCount: Number(sectorCount).toString(),
+      validTill: Number(validTill).toString(),
       ipfsPeerId,
     };
   } catch (err) {
@@ -119,7 +113,7 @@ export async function initiateDeal(
     const marketplaceContract = getMarketplaceContract();
     const account = await getAccount();
     const hash = await marketplaceContract.write.initiateDeal(
-      [providerAddress, fileSize, duration],
+      [providerAddress, BigInt(fileSize), BigInt(duration)],
       {
         account,
         value: parseEther(amount.toString()),
@@ -184,5 +178,5 @@ export async function approveDeal(userAddress: AddressType) {
   if (!providerAddress) throw new Error("User is not a provider");
 
   const providerContract = getProviderContract(providerAddress);
-  await providerContract.write.approveDeal([userAddress]);
+  await providerContract.write.approveDeal([userAddress], {account});
 }
