@@ -141,7 +141,14 @@ export async function initiateDeal(
 
 export async function fetchProviderDeals(providerAddress: AddressType) {
   const providerContract = getProviderContract(providerAddress);
-  const deals = await providerContract.read.getDeals();
+  const deals = await providerContract.read.getAllDeals();
+
+  return deals;
+}
+
+export async function fetchUserDeals() {
+  const marketplaceContract = getMarketplaceContract();
+  const deals = await marketplaceContract.read.getUserDeals();
 
   return deals;
 }

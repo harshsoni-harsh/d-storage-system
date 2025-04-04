@@ -16,6 +16,9 @@ contract Marketplace {
     // userAddress -> provider -> bool
     mapping(address => mapping(address => bool)) private user_deals;
 
+    // userAddress -> providerInstance[]
+    mapping(address => address[]) private userDealProviders;
+
     event ProviderRegistered(address indexed providerAddress, address indexed providerInstance);
     event DealCreated(address indexed userAddress, address indexed provider);
     event PaymentReleased(
@@ -31,6 +34,11 @@ contract Marketplace {
     function getAllProviders() external view returns (address[] memory) {
         return providerList;
     }
+
+    function getUserDeals() external view returns (address[] memory) {
+        return userDealProviders[msg.sender];
+    }
+
 
     function registerProvider(
         string memory _ipfsPeerId,
@@ -77,6 +85,7 @@ contract Marketplace {
         );
 
         user_deals[msg.sender][_provider] = true;
+        userDealProviders[msg.sender].push(address(provider));
 
         provider.reserveSectors(msg.sender, _sectorCount);
 
