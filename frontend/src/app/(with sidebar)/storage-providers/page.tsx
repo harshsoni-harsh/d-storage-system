@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import DealDialog from "@/components/ui/ConnectionDialogCreateDeal"
-import { initiateDeal, getProviderDetails, getProviders } from '@/lib/contract-interactions';
+import { initiateDeal, getProviderDetails, getProviders } from '@/lib/web3';
 import { PeerType, ProviderType } from '@/types/types';
 import { getPeerLatency, getPeerStats } from '@/app/actions';
 

@@ -31,3 +31,22 @@ export type DealDialogProps = {
   }) => Promise<void>;
   text?: string;
 };
+
+export type ProviderDealType = {
+  addr: AddressType;
+  status: 'Active' | 'Completed' | 'Waiting for Approval';
+  price: number;
+  remainingStorage?: number;
+  validTill: number;
+  cancelReason?: string;
+};
+
+export type UserDealType = {
+  addr: AddressType;
+  status: 'Active' | 'Completed' | 'Waiting for Approval';
+  price: number;
+  remainingStorage?: number;
+  remainingDuration?: string;
+  validTill: number;
+  cancelReason?: string;
+};

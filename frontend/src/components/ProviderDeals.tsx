@@ -4,23 +4,16 @@ import { ReactTable } from '@/components/ReactTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";  
+import Image from "next/image";
 
-type ProviderDealType = {
-  addr: string;
-  status: 'Active' | 'Cancelled' | 'Completed' | 'Waiting for Approval';
-  price: number;
-  remainingStorage?: number;
-  remainingDuration?: string;
-  timestamp: string;
-  cancelReason?: string;
-};
+import { fetchProviderDeals, fetchDealDetails, approveDeal } from '@/lib/web3';
+import { AddressType, ProviderDealType } from '@/types/types';
+import { toast } from '@/hooks/use-toast';
 
 export default function ProviderDeals() {
   const [deals, setDeals] = useState<ProviderDealType[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<ProviderDealType[]>([]);
-  const [filterText, setFilterText] = useState<string>(''); 
-  const [reasonMap, setReasonMap] = useState<Record<string, string>>({});
+  const [filterText, setFilterText] = useState<string>('');
 
   useEffect(() => {
     syncDeals();
@@ -37,51 +30,85 @@ export default function ProviderDeals() {
   }, [filterText, deals]);
 
   async function syncDeals() {
-    const dummyDeals: ProviderDealType[] = [
-      { addr: '0x123aladkaljdkajdabc', status: 'Active', price: 15.5, remainingStorage: 100, remainingDuration: '30 days', timestamp: '2024-04-01 12:00:00' },
-      { addr: '0x456...def', status: 'Cancelled', price: 10, timestamp: '2024-03-28 10:30:00', cancelReason: 'Provider unresponsive' },
-      { addr: '0x789...ghi', status: 'Completed', price: 20, timestamp: '2024-02-20 08:15:00' },
-      { addr: '0x321...jkl', status: 'Waiting for Approval', price: 25, timestamp: '2024-03-20 12:00:00', cancelReason: 'Pending review' },
-      { addr: '0xAAA111BBB222CCC333', status: 'Active', price: 18, remainingStorage: 200, remainingDuration: '45 days', timestamp: '2024-04-05 14:20:00' },
-      { addr: '0xDDD444EEE555FFF666', status: 'Cancelled', price: 12, timestamp: '2024-03-15 09:00:00', cancelReason: 'Insufficient funds' },
-      { addr: '0xGGG777HHH888III999', status: 'Completed', price: 22, timestamp: '2024-01-30 16:45:00' },
-      { addr: '0xJJJ000KKK111LLL222', status: 'Waiting for Approval', price: 30, remainingStorage: 150, remainingDuration: '60 days', timestamp: '2024-04-10 11:30:00' },
-    ];
-    setDeals(dummyDeals);
+    try {
+      const deals = await fetchProviderDeals();
+      const dealsData = await Promise.all(
+        deals.map(async (dealAddress: AddressType): Promise<ProviderDealType> => {
+          const details = await fetchDealDetails(dealAddress);
+
+          let status: ProviderDealType['status'] = 'Active';
+          if (details.completed) status = 'Completed';
+          else if (!details.isActive) status = 'Waiting for Approval';
+
+          return ({
+            addr: dealAddress,
+            status,
+            price: Number(details.pricePerSector),
+            remainingStorage: Number(details.sectorCount),
+            validTill: Number(details.validTill)
+          } as ProviderDealType);
+        })
+      ) as ProviderDealType[];
+
+      setDeals(dealsData);
+    } catch (error) {
+      if (error instanceof Error) {
+        toast({
+          title: "Error syncing deals",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error syncing deals",
+          description: "Check your browser's console",
+          variant: "destructive"
+        });
+        console.error('Error syncing deals:', error);
+      }
+    }
   }
 
-  function handleConfirmDeal(addr: string) {
-    setDeals(prevDeals =>
-      prevDeals.map(deal => 
-        deal.addr === addr ? { ...deal, status: 'Active' } : deal
-      )
-    );
+  async function handleConfirmDeal(userAddress: AddressType) {
+    try {
+      await approveDeal(userAddress);
+      setDeals(prevDeals =>
+        prevDeals.map(deal =>
+          deal.addr === userAddress
+            ? { ...deal, status: 'Active' }
+            : deal
+        )
+      );
+    } catch (error) {
+      toast({
+        title: "Failed to confirm deal",
+        description: "Check your browser's console",
+        variant: "destructive"
+      })
+      console.error(`Failed to confirm deal for ${userAddress}:`, error);
+    }
   }
 
-  function handleCancelDeal(addr: string) {
-    setDeals(prevDeals =>
-      prevDeals.map(deal => 
-        deal.addr === addr ? { ...deal, status: 'Cancelled', cancelReason: reasonMap[addr] || '' } : deal
-      )
-    );
+  async function handleCancelDeal(dealAddress: AddressType) {
+
   }
 
   const columns = useMemo(
     () => [
       { header: 'User Wallet Address', accessorKey: 'addr' },
-      { 
-        header: 'Status', 
-        accessorKey: 'status', 
+      {
+        header: 'Status',
+        accessorKey: 'status',
         cell: ({ row }: { row: any }) => {
           const status = row.original.status;
           const statusColor =
             status === 'Active'
               ? 'text-green-500'
               : status === 'Cancelled'
-              ? 'text-red-500'
-              : status === 'Waiting for Approval'
-              ? 'text-orange-500'
-              : 'text-gray-500';
+                ? 'text-red-500'
+                : status === 'Waiting for Approval'
+                  ? 'text-orange-500'
+                  : 'text-gray-500';
           return (
             <div className={`flex items-center ${statusColor}`}>
               <span>{status}</span>
@@ -92,41 +119,13 @@ export default function ProviderDeals() {
       { header: 'Price ($)', accessorKey: 'price' },
       {
         header: 'Remaining Storage (GB)',
-        accessorFn: (row: ProviderDealType) => (row.status === 'Active' ? row.remainingStorage ?? 'N/A' : 'N/A'),
+        accessorFn: (row: ProviderDealType) => row.remainingStorage ?? 'N/A',
       },
       {
-        header: 'Remaining Duration',
-        accessorFn: (row: ProviderDealType) => (row.status === 'Active' ? row.remainingDuration ?? 'N/A' : 'N/A'),
-      },
-      { header: 'Timestamp', accessorKey: 'timestamp' },
-      {
-        header: 'Reason',
-        cell: ({ row }: { row: any }) => {
-          const { addr, status } = row.original;
-          const isWaitingForApproval = status === 'Waiting for Approval' || status === 'Active';
-          return (
-            <div>
-              {isWaitingForApproval && !reasonMap[addr] && (
-                <Button
-                  variant="outline"
-                  onClick={() => setReasonMap(prev => ({ ...prev, [addr]: '' }))}
-                >
-                  Add Reason
-                </Button>
-              )}
-              {isWaitingForApproval && reasonMap[addr] && (
-                <Input
-                  className="w-40 text-sm mt-2"
-                  placeholder="Enter reason..."
-                  value={reasonMap[addr]}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setReasonMap((prev) => ({ ...prev, [addr]: value }));
-                  }}
-                />
-              )}
-            </div>
-          );
+        header: 'Valid Till',
+        accessorFn: (row: ProviderDealType) => {
+          const date = new Date(row.validTill * 1000);
+          return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
         },
       },
       {
@@ -162,7 +161,7 @@ export default function ProviderDeals() {
         },
       },
     ],
-    [reasonMap]
+    []
   );
 
   return (

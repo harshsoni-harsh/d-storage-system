@@ -7,7 +7,10 @@ settings:
 importers:
 
   .:
-    devDependencies:
+    dependencies:
+      '@nomicfoundation/hardhat-ignition':
+        specifier: ^0.15.10
+        version: 0.15.10(@nomicfoundation/hardhat-verify@2.0.13(hardhat@2.22.19(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.8.2))(typescript@5.8.2)))(hardhat@2.22.19(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.8.2))(typescript@5.8.2))
       '@nomicfoundation/hardhat-toolbox':
         specifier: ^5.0.0
         version: 5.0.0(2741f24c07ef11cbfda66a040d919d9c)
