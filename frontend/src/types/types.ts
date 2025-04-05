@@ -41,3 +41,12 @@ export type ProviderDealType = {
   cancelReason?: string;
 };
 
+export type UserDealType = {
+  addr: AddressType;
+  status: 'Active' | 'Completed' | 'Waiting for Approval';
+  price: number;
+  remainingStorage?: number;
+  remainingDuration?: string;
+  validTill: number;
+  cancelReason?: string;
+};

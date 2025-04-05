@@ -16,7 +16,7 @@ contract Marketplace {
     // userAddress -> provider -> bool
     mapping(address => mapping(address => bool)) private user_deals;
 
-    // userAddress -> providerInstance[]
+    // userAddress -> dealInstance[]
     mapping(address => address[]) private userDealProviders;
 
     event ProviderRegistered(address indexed providerAddress, address indexed providerInstance);
@@ -76,8 +76,8 @@ contract Marketplace {
             _sectorCount <= provider.sectorCount(),
             "Insufficient provider storage"
         );
-
-        provider.initiateDeal(
+        
+        address dealAddress = provider.initiateDeal(
             msg.sender,
             provider.pricePerSector(),
             _sectorCount,
@@ -85,7 +85,7 @@ contract Marketplace {
         );
 
         user_deals[msg.sender][_provider] = true;
-        userDealProviders[msg.sender].push(address(provider));
+        userDealProviders[msg.sender].push(dealAddress);
 
         provider.reserveSectors(msg.sender, _sectorCount);
 

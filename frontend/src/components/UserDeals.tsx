@@ -4,18 +4,10 @@ import { ReactTable } from '@/components/ReactTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";  // For the refresh icon
-import { FaInfoCircle } from 'react-icons/fa';  // For the info icon
-
-type UserDealType = {
-  addr: string;
-  status: 'Active' | 'Cancelled' | 'Completed' | 'Waiting for Approval';
-  price: number;
-  remainingStorage?: number;
-  remainingDuration?: string;
-  timestamp: string;
-  cancelReason?: string;
-};
+import Image from "next/image";  
+import { FaInfoCircle } from 'react-icons/fa';  
+import { fetchUserDeals , fetchDealDetails} from '@/lib/web3';
+import  {AddressType , UserDealType} from '@/types/types';
 
 export default function UserDeals() {
   const [deals, setDeals] = useState<UserDealType[]>([]);
@@ -35,22 +27,35 @@ export default function UserDeals() {
   }, [filterText, deals]);
 
   async function syncDeals() {
-    const dummyDeals: UserDealType[] = [
-      { addr: '0x123aladkaljdkajdabc', status: 'Active', price: 15.5, remainingStorage: 100, remainingDuration: '30 days', timestamp: '2024-04-01 12:00:00' },
-      { addr: '0x456...def', status: 'Cancelled', price: 10, timestamp: '2024-03-28 10:30:00', cancelReason: 'Provider unresponsive' },
-      { addr: '0x789...ghi', status: 'Completed', price: 20, timestamp: '2024-02-20 08:15:00' },
-      { addr: '0x321...jkl', status: 'Waiting for Approval', price: 25, timestamp: '2024-03-20 12:00:00', cancelReason: 'Pending review' },
-      { addr: '0x123aladkaljdkajdabc', status: 'Active', price: 15.5, remainingStorage: 100, remainingDuration: '30 days', timestamp: '2024-04-01 12:00:00' },
-      { addr: '0x456...def', status: 'Cancelled', price: 10, timestamp: '2024-03-28 10:30:00', cancelReason: 'Provider unresponsive' },
-      { addr: '0x789...ghi', status: 'Completed', price: 20, timestamp: '2024-02-20 08:15:00' },
-      { addr: '0x321...jkl', status: 'Waiting for Approval', price: 25, timestamp: '2024-03-20 12:00:00', cancelReason: 'Pending review' },
-    ];
-    setDeals(dummyDeals);
-  }
-
+  try{
+    const deals = await fetchUserDeals();
+      console.log(deals);
+      const detailedDeals =  await Promise.all(
+        deals.map(async (dealAddress: AddressType) : Promise<UserDealType> => { 
+          const details = await fetchDealDetails(dealAddress);
+          let status: UserDealType['status'] = 'Active';
+          if (details.completed) status = 'Completed';
+          else if (!details.isActive) status = 'Waiting for Approval';
+          
+          return({
+            addr: dealAddress,
+            status: status,
+            price: Number(details.pricePerSector),
+            remainingStorage: Number(details.sectorCount),
+            validTill: Number(details.validTill)
+          }as UserDealType);
+        }
+      )
+    )
+    setDeals(detailedDeals);
+    } catch (error) {
+      console.error('Error syncing deals:', error);
+  
+    }
+}
   const columns = useMemo(
     () => [
-      { header: 'Provider Address', accessorKey: 'addr' },
+      { header: 'Deal Address', accessorKey: 'addr' },
       { 
         header: 'Status', 
         accessorKey: 'status', 
@@ -67,14 +72,6 @@ export default function UserDeals() {
           return (
             <div className={`flex items-center ${statusColor}`}>
               <span>{status}</span>
-              {(status === 'Cancelled' || status === 'Waiting for Approval') && row.original.cancelReason && (
-                <div className="relative group inline-block ml-2">
-                  <FaInfoCircle size={16} color="#777" />
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block transition-opacity duration-150 rounded-md bg-gray-100 p-2 text-xs text-gray-800 shadow-lg whitespace-nowrap">
-                    {row.original.cancelReason}
-                  </div>
-                </div>
-              )}
             </div>
           );
         }
@@ -82,13 +79,16 @@ export default function UserDeals() {
       { header: 'Price ($)', accessorKey: 'price' },
       {
         header: 'Remaining Storage (GB)',
-        accessorFn: (row: UserDealType) => (row.status === 'Active' ? row.remainingStorage ?? 'N/A' : 'N/A'),
+        accessorFn: (row: UserDealType) => row.remainingStorage ?? 'N/A',
       },
       {
-        header: 'Remaining Duration',
-        accessorFn: (row: UserDealType) => (row.status === 'Active' ? row.remainingDuration ?? 'N/A' : 'N/A'),
+        header: 'Valid Till',
+        accessorFn: (row: UserDealType) => {
+          const date = new Date(row.validTill * 1000);
+          return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+        },
+        
       },
-      { header: 'Timestamp', accessorKey: 'timestamp' },
       {
         header: 'Action',
         cell: ({ row }: { row: any }) => {

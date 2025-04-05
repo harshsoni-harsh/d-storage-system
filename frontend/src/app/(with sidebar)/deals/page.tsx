@@ -8,7 +8,7 @@ export default function Main() {
 
   return (
     <div className="flex flex-col items-center size-full">
-      {type === 'provider' ? <UserDeals /> : <ProviderDeals />}
+      {type === 'user' ? <UserDeals /> : <ProviderDeals />}
     </div>
   );
 }
