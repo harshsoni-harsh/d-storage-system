@@ -2,8 +2,8 @@
 
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3002";
 
-export async function fetchCID({ cid }: { cid: string }) {
-  const backendURL = `${API_BASE_URL}/storage/getById?cid=${cid}`;
+export async function fetchCID({ cid, addr }: { cid: string, addr?: string }) {
+  const backendURL = `${API_BASE_URL}/storage/getById?cid=${cid}` + (addr ? `&addr=${addr}` : "");
 
   const res = await fetch(backendURL);
   if (!res.ok) throw new Error(`Error retrieving file: ${res.statusText}`);
@@ -70,7 +70,7 @@ export async function connectPeer(addr: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      peerId: addr,
+      addr: addr,
     }),
   });
 
@@ -94,8 +94,8 @@ export async function getIpfsAddress() {
   }
 }
 
-export async function getPeerStats(peerId: string) {
-  const res = await fetch(`${API_BASE_URL}/peers?peerId=${peerId}`);
+export async function getPeerStats(addr: string) {
+  const res = await fetch(`${API_BASE_URL}/peers?addr=${addr}`);
   const data = await res.json();
 
   if (!res.ok) {
@@ -105,10 +105,10 @@ export async function getPeerStats(peerId: string) {
   }
 }
 
-export async function getPeerLatency(peerId: string) {
+export async function getPeerLatency(addr: string) {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/peers/get-latency?peerId=${peerId}`
+      `${API_BASE_URL}/peers/get-latency?addr=${addr}`
     );
     const data = await res.json();
 
