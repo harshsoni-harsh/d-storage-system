@@ -15,7 +15,7 @@ export default function Home() {
     <div className="h-full flex flex-col items-center justify-center p-8">
       <div className="flex py-2 gap-8 max-xl:flex-col max-w-full">
         <div className="flex flex-col gap-4">
-          <p className="text-xl font-bold">Manage files on IPFS with Helia</p>
+          <p className="text-xl font-bold">Manage files on IPFS</p>
           <UploadFile {...{ setCid }} />
           <RetrieveFile {...{ cid, setCid }} />
         </div>

@@ -5,7 +5,7 @@ const KUBO_URL = process.env.KUBO_URL || "http://localhost:5001";
 
 @Injectable()
 export class IPFSService {
-  private ipfsClient!: KuboRPCClient;
+  ipfsClient!: KuboRPCClient;
 
   async onModuleInit(): Promise<void> {
     this.ipfsClient = createIpfsClient({ url: KUBO_URL });
