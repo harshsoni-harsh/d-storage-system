@@ -21,7 +21,9 @@ export async function registerProvider(
 
 export async function fetchUserDeals() {
   const marketplaceContract = await getMarketplaceContract();
-  return await marketplaceContract.read.getUserDeals();
+  const deals = await marketplaceContract.read.getUserDeals();
+  console.log({deals})
+  return deals;
 }
 
 export async function getProviders() {

@@ -6,14 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-import { fetchProviderDeals, fetchDealDetails, getProviders, approveDeal } from '@/lib/web3';
+import { fetchProviderDeals, fetchDealDetails, approveDeal } from '@/lib/web3';
 import { AddressType, ProviderDealType } from '@/types/types';
+import { toast } from '@/hooks/use-toast';
 
 export default function ProviderDeals() {
   const [deals, setDeals] = useState<ProviderDealType[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<ProviderDealType[]>([]);
-  const [filterText, setFilterText] = useState<string>(''); 
-  const [reasonMap, setReasonMap] = useState<Record<string, string>>({});
+  const [filterText, setFilterText] = useState<string>('');
 
   useEffect(() => {
     syncDeals();
@@ -31,71 +31,84 @@ export default function ProviderDeals() {
 
   async function syncDeals() {
     try {
-      const providers = await getProviders();
-      const deals = await Promise.all(providers.map(async provider => {
-        const deals = await fetchProviderDeals(provider) as AddressType[];
-        return await Promise.all(
-          deals.map(async (dealAddress: AddressType) : Promise<ProviderDealType> => { 
-            const details = await fetchDealDetails(dealAddress);
-    
-            let status: ProviderDealType['status'] = 'Active';
-            if (details.completed) status = 'Completed';
-            else if (!details.isActive) status = 'Waiting for Approval';
-            
-            return ({
-              addr: dealAddress,
-              status,
-              price: Number(details.pricePerSector),
-              remainingStorage: Number(details.sectorCount),
-              validTill: Number(details.validTill)
-            } as ProviderDealType);
-          })
-        ) as ProviderDealType[];
-      }));
-      const dealsData = deals.flat();
-      
+      const deals = await fetchProviderDeals();
+      const dealsData = await Promise.all(
+        deals.map(async (dealAddress: AddressType): Promise<ProviderDealType> => {
+          const details = await fetchDealDetails(dealAddress);
+
+          let status: ProviderDealType['status'] = 'Active';
+          if (details.completed) status = 'Completed';
+          else if (!details.isActive) status = 'Waiting for Approval';
+
+          return ({
+            addr: dealAddress,
+            status,
+            price: Number(details.pricePerSector),
+            remainingStorage: Number(details.sectorCount),
+            validTill: Number(details.validTill)
+          } as ProviderDealType);
+        })
+      ) as ProviderDealType[];
+
       setDeals(dealsData);
     } catch (error) {
-      console.error('Error syncing deals:', error);
-  
+      if (error instanceof Error) {
+        toast({
+          title: "Error syncing deals",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error syncing deals",
+          description: "Check your browser's console",
+          variant: "destructive"
+        });
+        console.error('Error syncing deals:', error);
+      }
     }
   }
 
-  async function handleConfirmDeal(dealAddress: AddressType) {
-  try {
-    await approveDeal(dealAddress);
-    setDeals(prevDeals =>
-      prevDeals.map(deal =>
-        deal.addr === dealAddress
-          ? { ...deal, status: 'Active' }
-          : deal
-      )
-    );
-  } catch (error) {
-    console.error(`Failed to confirm deal ${dealAddress}:`, error);
+  async function handleConfirmDeal(userAddress: AddressType) {
+    try {
+      await approveDeal(userAddress);
+      setDeals(prevDeals =>
+        prevDeals.map(deal =>
+          deal.addr === userAddress
+            ? { ...deal, status: 'Active' }
+            : deal
+        )
+      );
+    } catch (error) {
+      toast({
+        title: "Failed to confirm deal",
+        description: "Check your browser's console",
+        variant: "destructive"
+      })
+      console.error(`Failed to confirm deal for ${userAddress}:`, error);
+    }
   }
-}
 
-async function handleCancelDeal(dealAddress: AddressType){
-  
-}
+  async function handleCancelDeal(dealAddress: AddressType) {
+
+  }
 
   const columns = useMemo(
     () => [
       { header: 'User Wallet Address', accessorKey: 'addr' },
-      { 
-        header: 'Status', 
-        accessorKey: 'status', 
+      {
+        header: 'Status',
+        accessorKey: 'status',
         cell: ({ row }: { row: any }) => {
           const status = row.original.status;
           const statusColor =
             status === 'Active'
               ? 'text-green-500'
               : status === 'Cancelled'
-              ? 'text-red-500'
-              : status === 'Waiting for Approval'
-              ? 'text-orange-500'
-              : 'text-gray-500';
+                ? 'text-red-500'
+                : status === 'Waiting for Approval'
+                  ? 'text-orange-500'
+                  : 'text-gray-500';
           return (
             <div className={`flex items-center ${statusColor}`}>
               <span>{status}</span>
@@ -107,42 +120,12 @@ async function handleCancelDeal(dealAddress: AddressType){
       {
         header: 'Remaining Storage (GB)',
         accessorFn: (row: ProviderDealType) => row.remainingStorage ?? 'N/A',
-      },      
+      },
       {
         header: 'Valid Till',
         accessorFn: (row: ProviderDealType) => {
           const date = new Date(row.validTill * 1000);
           return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-        },
-      },
-      {
-        header: 'Reason',
-        cell: ({ row }: { row: any }) => {
-          const { addr, status } = row.original;
-          const isWaitingForApproval = status === 'Waiting for Approval' || status === 'Active';
-          return (
-            <div>
-              {isWaitingForApproval && !reasonMap[addr] && (
-                <Button
-                  variant="outline"
-                  onClick={() => setReasonMap(prev => ({ ...prev, [addr]: '' }))}
-                >
-                  Add Reason
-                </Button>
-              )}
-              {isWaitingForApproval && reasonMap[addr] && (
-                <Input
-                  className="w-40 text-sm mt-2"
-                  placeholder="Enter reason..."
-                  value={reasonMap[addr]}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setReasonMap((prev) => ({ ...prev, [addr]: value }));
-                  }}
-                />
-              )}
-            </div>
-          );
         },
       },
       {
@@ -178,7 +161,7 @@ async function handleCancelDeal(dealAddress: AddressType){
         },
       },
     ],
-    [reasonMap]
+    []
   );
 
   return (

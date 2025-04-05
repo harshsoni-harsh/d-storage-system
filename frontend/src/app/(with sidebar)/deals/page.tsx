@@ -4,7 +4,7 @@ import UserDeals from '@/components/UserDeals';
 import ProviderDeals from '@/components/ProviderDeals';
 
 export default function Main() {
-  const [type, setType] = useState<'user' | 'provider'>('user'); // Change this manually
+  const [type, setType] = useState<'user' | 'provider'>('provider');
 
   return (
     <div className="flex flex-col items-center size-full">

@@ -442,7 +442,7 @@ export const ProviderABI = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_userAddress",
+        "name": "_dealAddress",
         "type": "address"
       }
     ],

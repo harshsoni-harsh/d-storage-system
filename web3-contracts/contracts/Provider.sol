@@ -81,14 +81,11 @@ contract Provider {
     }
 
     function approveDeal(
-        address _userAddress
+        address _dealAddress
     ) external payable {
-        address dealAddress = dealsMapped[_userAddress];
-        
-        require(dealAddress != address(0), "Deal doesn't exists");
         require(msg.sender == walletAddress, "Only provider can approve the deal");
         
-        Deal deal = Deal(dealAddress);
+        Deal deal = Deal(_dealAddress);
         require(!deal.isActive(), "Deal already approved");
 
         deal.activateDeal();
