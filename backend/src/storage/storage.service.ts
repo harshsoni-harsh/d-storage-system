@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import * as fs from "fs";
 import * as path from "path";
+import { Readable } from "stream";
 import { fileURLToPath } from "url";
 import { createHelia, Helia } from "helia";
 import { unixfs, UnixFS } from "@helia/unixfs";
@@ -70,32 +71,57 @@ export class StorageService implements OnModuleInit, OnApplicationShutdown {
     Logger.debug("Helia and IPFS client initialized.");
   }
 
-  async storeFile(fileBuffer: Buffer): Promise<string> {
-    if (!this.unixFs) throw new Error("Helia is not initialized.");
-
-    const uint8Array = new Uint8Array(fileBuffer);
-    const cid = await this.unixFs.addBytes(uint8Array);
-    const cidStr = cid.toString();
-
-    Logger.debug(`File stored with CID: ${cidStr}`);
-
-    // Pin the file via Kubo to persist storage
-    await this.ipfsClient.pin.add(cidStr);
-    Logger.debug(`File pinned with CID: ${cidStr}`);
-
-    return cidStr;
+  async storeFile(fileStream: NodeJS.ReadableStream): Promise<string> {
+    const source = { async *[Symbol.asyncIterator]() { for await (const chunk of fileStream) { yield chunk as Uint8Array; } } };
+    const result = await this.ipfsClient.add(source, { pin: true });
+    return result.cid.toString();
   }
 
-  async retrieveFile(cid: string): Promise<Buffer> {
-    if (!this.unixFs) throw new Error("Helia is not initialized.");
-
+  async retrieveFile(cid: string, addr?: string): Promise<Readable> {
     try {
       const cidObject = CID.parse(cid);
-      const asyncIterable = this.unixFs.cat(cidObject);
-      const fileChunks = await this.retrieveWithTimeout(asyncIterable, 10000);
-      return Buffer.concat(fileChunks);
+      
+      if (addr) {
+        try {
+          Logger.debug(`Attempting to connect to peer: ${addr}`);
+          await this.ipfsClient.swarm.connect(addr as any);
+          Logger.debug(`Successfully connected to peer: ${addr}`);
+        } catch (connectError) {
+          Logger.warn(`Could not connect to peer ${addr}:`, connectError);
+        }
+    
+      }
+
+      try {
+        await this.ipfsClient.pin.add(cidObject, { verbose: true,  });
+        Logger.debug(`File with CID ${cid} successfully pinned.`);
+      } catch (pinError) {
+        Logger.warn(`Failed to pin CID ${cid}:`, pinError);
+      }
+
+      const stream = Readable.from(
+        this.ipfsClient.cat(cidObject, { timeout: 30000, })
+      );
+
+      let totalBytes = 0;
+
+      stream.on("error", (err) => {
+        Logger.error(`Stream error for CID ${cid}:`, err);
+      });
+
+      stream.on("data", (chunk) => {
+        totalBytes += chunk.length;
+        Logger.debug(`Received ${totalBytes} bytes`);
+      });
+
+      stream.on("end", () => {
+        Logger.debug("Stream finished!");
+      });
+
+      return stream;
+
     } catch (error) {
-      Logger.error(`Error retrieving file with CID ${cid}:`, error);
+      Logger.error(`Failed to retrieve file with CID ${cid}:`, error);
       throw new Error("Failed to retrieve file from IPFS.");
     }
   }

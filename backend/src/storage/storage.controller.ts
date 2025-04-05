@@ -15,7 +15,7 @@ import { StorageService } from "./storage.service.js";
 import { FileInterceptor } from "@nestjs/platform-express";
 import * as path from "path";
 import { fileURLToPath } from "url";
-import { promises as fsPromises } from "fs";
+import { promises as fsPromises, createReadStream } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,7 +24,7 @@ const __dirname = path.dirname(__filename);
 export class StorageController {
   private readonly storagePath = path.join(__dirname, "..", "..", "uploads");
 
-  constructor(private readonly storageService: StorageService) {}
+  constructor(private readonly storageService: StorageService) { }
 
   @Post("/upload-chunk")
   @UseInterceptors(FileInterceptor("file"))
@@ -43,7 +43,7 @@ export class StorageController {
 
     const chunkIdx = parseInt(chunkIndex, 10);
     const totalChunksNum = parseInt(totalChunks, 10);
-    
+
     if (isNaN(chunkIdx) || isNaN(totalChunksNum) || chunkIdx < 0 || totalChunksNum <= 0) {
       throw new HttpException("Invalid chunk index or total chunks", HttpStatus.BAD_REQUEST);
     }
@@ -57,14 +57,13 @@ export class StorageController {
     if (chunkIdx + 1 === totalChunksNum) {
       Logger.debug(`All chunks received. Storing ${fileName} in IPFS...`);
       try {
-        const fileBuffer = await fsPromises.readFile(filePath);
-        const cid = await this.storageService.storeFile(fileBuffer);
+        const fileStream = createReadStream(filePath);
+        const cid = await this.storageService.storeFile(fileStream);
 
-        // Remove temporary file after successful storage
         await fsPromises.unlink(filePath);
         Logger.debug(`File ${fileName} successfully stored with CID: ${cid}`);
 
-        return ({ message: "File upload complete", cid });
+        return { message: "File upload complete", cid };
       } catch (error) {
         Logger.error("Error storing file:", error);
         throw new HttpException("Failed to store file", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -75,16 +74,18 @@ export class StorageController {
   }
 
   @Get("/getById")
-  async retrieveFile(@Query("cid") cid: string): Promise<StreamableFile> {
+  async retrieveFile(
+    @Query("cid") cid: string,
+    @Query("addr") addr?: string
+  ): Promise<StreamableFile> {
     if (!cid) {
       throw new HttpException("CID is required", HttpStatus.BAD_REQUEST);
     }
     try {
       Logger.debug(`Retrieving file with CID: ${cid}`);
-      const fileBuffer = await this.storageService.retrieveFile(cid);
-
+      const stream = await this.storageService.retrieveFile(cid, addr);
       Logger.debug(`Successfully retrieved file with CID: ${cid}`);
-      return new StreamableFile(fileBuffer, {
+      return new StreamableFile(stream, {
         disposition: 'attachment; filename="retrieved-file"',
         type: "application/octet-stream",
       });
