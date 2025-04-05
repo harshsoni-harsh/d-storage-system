@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { getIpfsAddress } from "@/app/actions";
-import { registerProvider } from "@/lib/contract-interactions";
+import { registerProvider } from "@/lib/web3";
 
 export default function Onboarding() {
   const [isClient, setIsClient] = useState(true);
@@ -20,8 +20,8 @@ export default function Onboarding() {
   const [fadeError, setFadeError] = useState(false);
 
   const [ipfsAddress, setIpfsAddress] = useState("");
-  const [maxStorage, setMaxStorage] = useState("");
-  const [price, setPrice] = useState("");
+  const [maxStorage, setMaxStorage] = useState(0);
+  const [price, setPrice] = useState(0);
 
   const router = useRouter();
 
@@ -62,8 +62,8 @@ export default function Onboarding() {
       if (!ipfsAddress || !price || !maxStorage) throw new Error("Please fill all values");
       await registerProvider(
         ipfsAddress,
-        BigInt(maxStorage),
-        BigInt(price)
+        maxStorage,
+        price
       );
       localStorage.setItem("isOnboardingDone", "true");
       router.replace("/");
@@ -134,13 +134,15 @@ export default function Onboarding() {
                 />
                 <Input
                   value={maxStorage}
-                  onChange={(e) => setMaxStorage(e.target.value)}
+                  type="number"
+                  onChange={(e) => setMaxStorage(parseInt(e.target.value))}
                   placeholder="Max Storage Size (GB)"
                   className="w-full"
                 />
                 <Input
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  type="number"
+                  onChange={(e) => setPrice(parseInt(e.target.value))}
                   placeholder="Price per GB (ETH)"
                   className="w-full"
                 />

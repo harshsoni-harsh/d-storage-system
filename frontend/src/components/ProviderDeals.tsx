@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-import { fetchProviderDeals, fetchDealDetails, getProviders, approveDeal } from '@/lib/contract-interactions';
+import { fetchProviderDeals, fetchDealDetails, getProviders, approveDeal } from '@/lib/web3';
 import { AddressType, ProviderDealType } from '@/types/types';
 
 export default function ProviderDeals() {
@@ -39,7 +39,7 @@ export default function ProviderDeals() {
             const details = await fetchDealDetails(dealAddress);
     
             let status: ProviderDealType['status'] = 'Active';
-            if (details.isCompleted) status = 'Completed';
+            if (details.completed) status = 'Completed';
             else if (!details.isActive) status = 'Waiting for Approval';
             
             return ({
