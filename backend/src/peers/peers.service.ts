@@ -1,15 +1,13 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { create as createIpfsClient, KuboRPCClient } from "kubo-rpc-client";
-
-const KUBO_URL = process.env.KUBO_URL || "http://localhost:5001";
+import { Injectable, Logger } from "@nestjs/common";
+import { IPFSService } from "../ipfs/ipfs.service.js";
 
 @Injectable()
-export class PeersService implements OnModuleInit {
-  private ipfsClient!: KuboRPCClient;
+export class PeersService {
 
-  async onModuleInit(): Promise<void> {
-    this.ipfsClient = createIpfsClient({ url: KUBO_URL });
-    Logger.debug("IPFS client initialized.", "peers");
+  constructor(private readonly ipfsService: IPFSService) { }
+
+  private get ipfsClient() {
+    return this.ipfsService.ipfsClient;
   }
 
   async addPeer(peerId: any) {
