@@ -10,7 +10,7 @@ const queryClient = new QueryClient();
 
 const MAINNET_RPC_URL = process.env.NEXT_PUBLIC_MAINNET_RPC_URL;
 const SEPOLIA_RPC_URL = process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL;
-const HARDHAT_RPC_URL = process.env.HARDHAT_RPC_URL;
+const HARDHAT_RPC_URL = process.env.NEXT_PUBLIC_HARDHAT_RPC_URL;
 
 if (!MAINNET_RPC_URL || !SEPOLIA_RPC_URL || !HARDHAT_RPC_URL) {
   throw new Error("One or more RPC URLs are not defined");
