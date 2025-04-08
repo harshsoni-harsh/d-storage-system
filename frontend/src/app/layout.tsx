@@ -2,7 +2,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Web3Provider } from "../components/providers/WalletProvider";
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
     title: "D Storage System",
@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className="antialiased dark:text-zinc-400">
+            <body className="antialiased dark:text-zinc-200">
                 <Web3Provider>
                     <ThemeProvider
                         attribute="class"

@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { fetchCID, fetchPinnedFiles, uploadChunk } from "@/app/actions";
+import { fetchCID, fetchPinnedFiles, pinCID, uploadChunk } from "@/app/actions";
 import { getFileHash } from "@/lib/utils";
+import { toast } from "sonner";
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
 
@@ -103,8 +104,20 @@ async function handleRetrieve(cid: string) {
   }
 }
 
+async function handlePinning(cid: string) {
+  if (!cid) return alert("Please enter the CID of the file.");
+
+  try {
+    await pinCID(cid);
+    toast.success(`Successfully pinned CID ${cid}`)
+  } catch (error) {
+    console.error("Pinning error:", error);
+  }
+}
+
 function RetrieveFile({ cid, setCid }: { cid: string; setCid: Dispatch<SetStateAction<string>> }) {
   const [loading, setLoading] = useState<boolean>(false);
+  const [pinLoading, setPinLoading] = useState<boolean>(false);
 
   return (
     <div className="flex flex-col gap-4 border border-zinc-600 p-8 rounded-lg">
@@ -127,7 +140,17 @@ function RetrieveFile({ cid, setCid }: { cid: string; setCid: Dispatch<SetStateA
         }}
         disabled={loading}
       >
-        {loading ? "Retrieving..." : "Retrieve from IPFS"}
+        {loading ? "Downloading..." : "Download file"}
+      </Button>
+      <Button
+        variant={"outline"}
+        onClick={() => {
+          setPinLoading(true);
+          handlePinning(cid).then(() => setPinLoading(false))
+        }}
+        disabled={loading}
+      >
+        {pinLoading ? "Pinning..." : "Pin CID"}
       </Button>
     </div>
   )

@@ -109,4 +109,11 @@ export class StorageController {
     return await this.storageService.getPinnedFiles();
   }
 
+  @Get("/pinCID")
+  async pinCID(
+    @Query("cid") cid: string,
+  ) {
+    return await this.storageService.pinFile(cid);
+  }
+
 }

@@ -122,3 +122,20 @@ export async function getPeerLatency(addr: string) {
     return '-'
   }
 }
+
+export async function pinCID(cid: string) {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/storage/pinCID?cid=${cid}`
+    );
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to connect backend");
+    } else {
+      return data;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
