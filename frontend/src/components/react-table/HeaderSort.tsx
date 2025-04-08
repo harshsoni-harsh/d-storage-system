@@ -1,11 +1,11 @@
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from "lucide-react";
 
-import { cn } from '@/lib/utils';
-import { Column } from '@tanstack/react-table';
+import { cn } from "@/lib/utils";
+import type { Column } from "@tanstack/react-table";
 
 const SortType = {
-  ASC: 'asc',
-  DESC: 'desc',
+  ASC: "asc",
+  DESC: "desc",
 } as const;
 
 type SortType = (typeof SortType)[keyof typeof SortType];
@@ -19,37 +19,37 @@ const SortToggler = ({ type }: SortTogglerProps) => {
     <div className="text-secondary-light">
       <ChevronUp
         className={cn(
-          'h-3 w-3',
+          "h-3 w-3",
           type === SortType.ASC
-            ? 'text-foreground brightness-200'
-            : 'text-muted-foreground brightness-50'
+            ? "text-foreground brightness-200"
+            : "text-muted-foreground brightness-50",
         )}
       />
       <ChevronDown
         className={cn(
-          'h-3 w-3 -mt-0.5',
+          "h-3 w-3 -mt-0.5",
           type === SortType.DESC
-            ? 'text-foreground brightness-200'
-            : 'text-muted-foreground brightness-50'
+            ? "text-foreground brightness-200"
+            : "text-muted-foreground brightness-50",
         )}
       />
     </div>
   );
 };
 
-interface HeaderSortProps {
-  column: Column<unknown, unknown>;
+interface HeaderSortProps<T> {
+  column: Column<T, unknown>;
   sort?: boolean;
 }
 
-const HeaderSort = ({ column, sort }: HeaderSortProps) => {
+const HeaderSort = <T,>({ column, sort }: HeaderSortProps<T>) => {
   const sortType = column.getIsSorted();
 
   return (
     <div
       {...(sort && {
         onClick: column.getToggleSortingHandler(),
-        className: 'cursor-pointer select-none',
+        className: "cursor-pointer select-none",
       })}
     >
       {sortType ? <SortToggler type={sortType} /> : <SortToggler />}

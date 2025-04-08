@@ -1,10 +1,10 @@
-import { AddressType } from "@/types/types";
-import { ensureChain } from "./utils";
+import type { AddressType } from "@/types/types";
 import {
   getDealContract,
   getMarketplaceContract,
   getProviderContract,
 } from "./contracts";
+import { ensureChain } from "./utils";
 import { getAccount } from "./web3-clients";
 
 export async function fetchDealDetails(dealAddress: AddressType) {
@@ -42,7 +42,7 @@ export async function approveDeal(userAddress: AddressType) {
   const providerContract = await getProviderContract(providerAddress);
   const { request } = await providerContract.simulate.approveDeal(
     [userAddress],
-    { account }
+    { account },
   );
   await walletClient.writeContract(request);
 }

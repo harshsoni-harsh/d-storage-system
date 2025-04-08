@@ -1,13 +1,14 @@
-// libraries
-import { useState } from 'react';
 import {
+  type ColumnDef,
+  flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  flexRender,
   useReactTable,
-  ColumnDef,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
+// libraries
+import { useState } from "react";
 
+import HeaderSort from "@/components/react-table/HeaderSort";
 // custom modules
 import {
   Table,
@@ -16,18 +17,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import HeaderSort from '@/components/react-table/HeaderSort';
+} from "@/components/ui/table";
 
-interface ReactTableProps {
-  data: unknown[];
-  columns: ColumnDef<unknown>[];
+interface ReactTableProps<T> {
+  data: T[];
+  columns: ColumnDef<T>[];
 }
 
-const ReactTable = ({ columns, data }: ReactTableProps) => {
+const ReactTable = <T,>({ columns, data }: ReactTableProps<T>) => {
   const [sorting, setSorting] = useState([
     {
-      id: 'addr',
+      id: "addr",
       desc: false,
     },
   ]);
@@ -53,9 +53,7 @@ const ReactTable = ({ columns, data }: ReactTableProps) => {
               <TableHead
                 key={header.id}
                 className={
-                  header.column.getCanSort()
-                    ? 'cursor-pointer select-none'
-                    : ''
+                  header.column.getCanSort() ? "cursor-pointer select-none" : ""
                 }
                 onClick={header.column.getToggleSortingHandler()}
               >
@@ -63,7 +61,7 @@ const ReactTable = ({ columns, data }: ReactTableProps) => {
                   <span>
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
                   </span>
                   {header.column.getCanSort() && (

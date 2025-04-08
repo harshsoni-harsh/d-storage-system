@@ -2,8 +2,8 @@
 
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3002";
 
-export async function fetchCID({ cid, addr }: { cid: string, addr?: string }) {
-  const backendURL = `${API_BASE_URL}/storage/getById?cid=${cid}` + (addr ? `&addr=${addr}` : "");
+export async function fetchCID({ cid, addr }: { cid: string; addr?: string }) {
+  const backendURL = `${API_BASE_URL}/storage/getById?cid=${cid}${addr ? `&addr=${addr}` : ""}`;
 
   const res = await fetch(backendURL);
   if (!res.ok) throw new Error(`Error retrieving file: ${res.statusText}`);
@@ -24,7 +24,7 @@ export async function uploadChunk(
   file: Blob,
   chunkIndex: number,
   totalChunks: number,
-  fileName: string
+  fileName: string,
 ): Promise<{ success: boolean; cid?: string; error?: string }> {
   try {
     const formData = new FormData();
@@ -78,9 +78,8 @@ export async function connectPeer(addr: string) {
 
   if (!res.ok) {
     throw new Error(data.error || "Failed to connect peer");
-  } else {
-    return data;
   }
+  return data;
 }
 
 export async function getIpfsAddress() {
@@ -89,9 +88,8 @@ export async function getIpfsAddress() {
 
   if (!res.ok) {
     throw new Error(data.error || "Failed to connect backend");
-  } else {
-    return data;
   }
+  return data;
 }
 
 export async function getPeerStats(addr: string) {
@@ -100,41 +98,34 @@ export async function getPeerStats(addr: string) {
 
   if (!res.ok) {
     throw new Error(data.error || "Failed to connect backend");
-  } else {
-    return data;
   }
+  return data;
 }
 
 export async function getPeerLatency(addr: string) {
   try {
-    const res = await fetch(
-      `${API_BASE_URL}/peers/get-latency?addr=${addr}`
-    );
+    const res = await fetch(`${API_BASE_URL}/peers/get-latency?addr=${addr}`);
     const data = await res.json();
 
     if (!res.ok) {
       throw new Error(data.error || "Failed to connect backend");
-    } else {
-      return data;
     }
+    return data;
   } catch (err) {
     console.error(err);
-    return '-'
+    return "-";
   }
 }
 
 export async function pinCID(cid: string) {
   try {
-    const res = await fetch(
-      `${API_BASE_URL}/storage/pinCID?cid=${cid}`
-    );
+    const res = await fetch(`${API_BASE_URL}/storage/pinCID?cid=${cid}`);
     const data = await res.json();
 
     if (!res.ok) {
       throw new Error(data.error || "Failed to connect backend");
-    } else {
-      return data;
     }
+    return data;
   } catch (err) {
     console.error(err);
   }

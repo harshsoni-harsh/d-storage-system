@@ -32,21 +32,12 @@ export type DealDialogProps = {
   text?: string;
 };
 
-export type ProviderDealType = {
+export type DealType = {
+  userAddr: AddressType;
   addr: AddressType;
-  status: 'Active' | 'Completed' | 'Waiting for Approval';
+  status: "Active" | "Completed" | "Waiting for Approval" | "Cancelled";
   price: number;
   remainingStorage?: number;
-  validTill: number;
-  cancelReason?: string;
-};
-
-export type UserDealType = {
-  addr: AddressType;
-  status: 'Active' | 'Completed' | 'Waiting for Approval';
-  price: number;
-  remainingStorage?: number;
-  remainingDuration?: string;
   validTill: number;
   cancelReason?: string;
 };

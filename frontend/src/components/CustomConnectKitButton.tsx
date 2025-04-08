@@ -6,7 +6,7 @@ export default function ConnectButton() {
     <ConnectKitButton.Custom>
       {({ isConnected, show, truncatedAddress, ensName }) => (
         <Button onClick={show}>
-          {isConnected ? ensName ?? truncatedAddress : "Connect Wallet"}
+          {isConnected ? (ensName ?? truncatedAddress) : "Connect Wallet"}
         </Button>
       )}
     </ConnectKitButton.Custom>

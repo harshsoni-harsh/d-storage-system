@@ -1,6 +1,15 @@
 // libraries
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 // custom modules
 import {
   Select,
@@ -8,17 +17,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationPrevious,
-  PaginationNext,
-} from '@/components/ui/pagination';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface TablePaginationProps {
   getPageCount: () => number;
@@ -44,7 +44,7 @@ const TablePagination = ({
   if (initialPageSize) {
     options = [...options, initialPageSize]
       .filter(
-        (item, index) => [...options, initialPageSize].indexOf(item) === index
+        (item, index) => [...options, initialPageSize].indexOf(item) === index,
       )
       .sort((a, b) => a - b);
   }
@@ -146,12 +146,13 @@ const TablePagination = ({
           {visiblePages.map((page) => (
             <PaginationItem key={page}>
               <button
+                type="button"
                 onClick={() => handleChangePagination(page)}
                 className={cn(
-                  'flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                  "flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   currentPage === page
-                    ? 'bg-primary text-primary-foreground'
-                    : ''
+                    ? "bg-primary text-primary-foreground"
+                    : "",
                 )}
               >
                 {page}

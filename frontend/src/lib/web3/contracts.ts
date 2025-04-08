@@ -1,11 +1,11 @@
 import { DealABI, MarketplaceABI, ProviderABI } from "@/lib/abi";
+import type { AddressType } from "@/types/types";
 import { getContract, isAddress } from "viem";
-import { AddressType } from "@/types/types";
 import { ensureChain } from "./utils";
 
 const MARKETPLACE_CONTRACT = process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT;
 
-export async  function getMarketplaceContract() {
+export async function getMarketplaceContract() {
   if (!MARKETPLACE_CONTRACT || !isAddress(MARKETPLACE_CONTRACT))
     throw new Error("Invalid address");
   const { publicClient, walletClient } = await ensureChain();

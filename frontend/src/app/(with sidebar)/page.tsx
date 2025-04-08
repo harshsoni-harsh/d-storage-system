@@ -1,10 +1,16 @@
 "use client";
 
+import { fetchCID, fetchPinnedFiles, pinCID, uploadChunk } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { fetchCID, fetchPinnedFiles, pinCID, uploadChunk } from "@/app/actions";
 import { getFileHash } from "@/lib/utils";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { toast } from "sonner";
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -69,15 +75,11 @@ function UploadFile({ setCid }: { setCid: Dispatch<SetStateAction<string>> }) {
         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
         disabled={loading}
       />
-      <Button
-        variant={"outline"}
-        onClick={handleUpload}
-        disabled={loading}
-      >
+      <Button variant={"outline"} onClick={handleUpload} disabled={loading}>
         {loading ? "Uploading..." : "Upload to IPFS"}
       </Button>
     </div>
-  )
+  );
 }
 
 async function handleRetrieve(cid: string) {
@@ -109,13 +111,16 @@ async function handlePinning(cid: string) {
 
   try {
     await pinCID(cid);
-    toast.success(`Successfully pinned CID ${cid}`)
+    toast.success(`Successfully pinned CID ${cid}`);
   } catch (error) {
     console.error("Pinning error:", error);
   }
 }
 
-function RetrieveFile({ cid, setCid }: { cid: string; setCid: Dispatch<SetStateAction<string>> }) {
+function RetrieveFile({
+  cid,
+  setCid,
+}: { cid: string; setCid: Dispatch<SetStateAction<string>> }) {
   const [loading, setLoading] = useState<boolean>(false);
   const [pinLoading, setPinLoading] = useState<boolean>(false);
 
@@ -136,7 +141,7 @@ function RetrieveFile({ cid, setCid }: { cid: string; setCid: Dispatch<SetStateA
         variant={"outline"}
         onClick={() => {
           setLoading(true);
-          handleRetrieve(cid).then(() => setLoading(false))
+          handleRetrieve(cid).then(() => setLoading(false));
         }}
         disabled={loading}
       >
@@ -146,19 +151,19 @@ function RetrieveFile({ cid, setCid }: { cid: string; setCid: Dispatch<SetStateA
         variant={"outline"}
         onClick={() => {
           setPinLoading(true);
-          handlePinning(cid).then(() => setPinLoading(false))
+          handlePinning(cid).then(() => setPinLoading(false));
         }}
         disabled={loading}
       >
         {pinLoading ? "Pinning..." : "Pin CID"}
       </Button>
     </div>
-  )
+  );
 }
 function PinnedFiles() {
   const [pinnedFiles, setPinnedFiles] = useState<string[]>([]);
 
-  async function fetchPins() {
+  const fetchPins = useCallback(async () => {
     try {
       const data = await fetchPinnedFiles();
       setPinnedFiles(data);
@@ -166,19 +171,19 @@ function PinnedFiles() {
       console.error("Error fetching pinned files:", error);
       setPinnedFiles([]);
     }
-  }
+  }, []);
 
   useEffect(() => {
     fetchPins();
-  }, []);
+  }, [fetchPins]);
 
   return (
     <div className="flex flex-col gap-4 border border-zinc-600 p-8 rounded-lg">
       <p className="text-lg font-bold">Pinned Files</p>
       {pinnedFiles.length > 0 ? (
-        pinnedFiles.map((cid, index) => (
+        pinnedFiles.map((cid) => (
           <div
-            key={index}
+            key={cid}
             className="flex justify-between items-center border border-zinc-500 p-2 m-2 rounded-md"
           >
             <p className="text-sm font-bold mx-4 truncate">{cid}</p>
@@ -191,5 +196,5 @@ function PinnedFiles() {
         <p className="text-sm text-gray-400">No pinned files available.</p>
       )}
     </div>
-  )
+  );
 }

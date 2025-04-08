@@ -1,26 +1,34 @@
-'use client'
+"use client";
 
-import { createPublicClient, createWalletClient, http, custom } from 'viem'
-import { mainnet, hardhat } from 'viem/chains'
- 
-export const getPublicClient = () => createPublicClient({
-  chain: hardhat,
-  transport: http(process.env.NEXT_PUBLIC_HARDHAT_RPC_URL ?? ''),
-})
+import { http, createPublicClient, createWalletClient, custom } from "viem";
+import { hardhat, mainnet } from "viem/chains";
 
-const isEthereumAvailable = typeof window !== 'undefined' && typeof window.ethereum !== 'undefined';
+export const getPublicClient = () =>
+  createPublicClient({
+    chain: hardhat,
+    transport: http(process.env.NEXT_PUBLIC_HARDHAT_RPC_URL ?? ""),
+  });
+
+const isEthereumAvailable =
+  typeof window !== "undefined" && typeof window.ethereum !== "undefined";
 
 // eg: Metamask
-export const getWalletClient = () => isEthereumAvailable ? createWalletClient({
-  chain: hardhat,
-  transport: custom(window.ethereum!),
-}) : null;
+export const getWalletClient = () => {
+  if (!isEthereumAvailable) return null;
+
+  return createWalletClient({
+    chain: hardhat,
+    transport: custom(window.ethereum),
+  });
+};
 
 export const getAccount = async () => {
   const walletClient = getWalletClient();
   if (!walletClient) {
-    throw new Error('Ethereum provider is not available. Please install Metamask or use a supported browser.');
+    throw new Error(
+      "Ethereum provider is not available. Please install Metamask or use a supported browser.",
+    );
   }
-  const [account] = await walletClient.getAddresses()
+  const [account] = await walletClient.getAddresses();
   return account;
-}
+};

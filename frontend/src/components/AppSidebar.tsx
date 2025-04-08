@@ -1,7 +1,5 @@
 "use client";
 
-import { CircuitBoard, Home } from "lucide-react";
-import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
@@ -13,11 +11,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import ThemeToggle from "./ThemeToggler";
 import { ConnectKitButton } from "connectkit";
+import { CircuitBoard, Home } from "lucide-react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import ThemeToggle from "./ThemeToggler";
 
 const items = [
   {
@@ -43,15 +43,15 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { theme } = useTheme() as { theme: 'light' | 'dark' | undefined };
+  const { theme } = useTheme() as { theme: "light" | "dark" | undefined };
   const path = usePathname();
   const router = useRouter();
 
   useEffect(() => {
     if (localStorage.getItem("isOnboardingDone") !== "true") {
-      router.push('/onboarding');
+      router.push("/onboarding");
     }
-  })
+  });
 
   return (
     <Sidebar className="max-w-48">
@@ -68,7 +68,10 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     {trimmedUrl !== "" ? (
                       <SidebarMenuButton asChild isActive={path === item.url}>
-                        <Link href={trimmedUrl} className="flex items-center space-x-2">
+                        <Link
+                          href={trimmedUrl}
+                          className="flex items-center space-x-2"
+                        >
                           <item.icon />
                           <span>{item.title}</span>
                         </Link>
@@ -88,7 +91,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="mx-2 mb-2">
         <ThemeToggle />
-        <Link href='/onboarding'>
+        <Link href="/onboarding">
           <SidebarMenuButton>Go to Onboarding</SidebarMenuButton>
         </Link>
       </SidebarFooter>

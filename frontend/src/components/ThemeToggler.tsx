@@ -14,11 +14,12 @@ export default function ThemeToggler() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return <button className="flex gap-2"></button>;
+  if (!mounted) return <button type="button" className="flex gap-2" />;
 
   return (
     <div className="flex gap-2">
       <Button
+        type="button"
         variant={"outline"}
         size="icon"
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}

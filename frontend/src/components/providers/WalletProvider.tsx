@@ -1,18 +1,19 @@
 "use client";
 
-import { WagmiProvider, createConfig, http, injected } from "wagmi";
-import { Chain, mainnet, sepolia } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";
-import { metaMask, walletConnect } from "wagmi/connectors";
+import { http, WagmiProvider, createConfig, injected } from "wagmi";
+import { type Chain, mainnet, sepolia } from "wagmi/chains";
+import { walletConnect } from "wagmi/connectors";
 
 const queryClient = new QueryClient();
 
 const MAINNET_RPC_URL = process.env.NEXT_PUBLIC_MAINNET_RPC_URL;
 const SEPOLIA_RPC_URL = process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL;
-const HARDHAT_RPC_URL = process.env.HARDHAT_RPC_URL!;
-if (!MAINNET_RPC_URL && !SEPOLIA_RPC_URL && !HARDHAT_RPC_URL) {
-  throw new Error("RPC urls not defined");
+const HARDHAT_RPC_URL = process.env.HARDHAT_RPC_URL;
+
+if (!MAINNET_RPC_URL || !SEPOLIA_RPC_URL || !HARDHAT_RPC_URL) {
+  throw new Error("One or more RPC URLs are not defined");
 }
 
 const hardhat: Chain & { network: string } = {
@@ -21,7 +22,7 @@ const hardhat: Chain & { network: string } = {
   network: "hardhat",
   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
   rpcUrls: {
-    default: { http: [HARDHAT_RPC_URL] }
+    default: { http: [HARDHAT_RPC_URL] },
   },
 };
 
@@ -32,13 +33,11 @@ if (!walletConnectProjectId) {
 
 const config = createConfig({
   chains: [mainnet, sepolia, hardhat],
-  connectors: [
-    walletConnect({projectId: walletConnectProjectId}),
-  ],
+  connectors: [walletConnect({ projectId: walletConnectProjectId })],
   transports: {
     [mainnet.id]: http(MAINNET_RPC_URL),
     [sepolia.id]: http(SEPOLIA_RPC_URL),
-    [hardhat.id]: http(HARDHAT_RPC_URL), 
+    [hardhat.id]: http(HARDHAT_RPC_URL),
   },
 });
 

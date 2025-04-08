@@ -1,15 +1,16 @@
 "use client";
 
+import { ConnectKitButton } from "connectkit";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { ConnectKitButton } from "connectkit";
-import { useRouter } from "next/navigation";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 import { getIpfsAddress } from "@/app/actions";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { registerProvider } from "@/lib/web3";
 
 export default function Onboarding() {
@@ -21,7 +22,7 @@ export default function Onboarding() {
 
   const [ipfsAddress, setIpfsAddress] = useState("");
   const [maxStorage, setMaxStorage] = useState<number>(0);
-  const [price, setPrice] = useState<number>(0.00);
+  const [price, setPrice] = useState<number>(0.0);
 
   const router = useRouter();
 
@@ -31,15 +32,15 @@ export default function Onboarding() {
     setTimeout(() => {
       setFadeError(false);
     }, 2000);
-  }
+  };
 
   useEffect(() => {
     setIsClient(true);
-    (async function () {
+    (async () => {
       const { addresses } = await getIpfsAddress();
-      setIpfsAddress(addresses[0] ?? '')
-    })()
-    localStorage.setItem("isOnboardingDone", "false")
+      setIpfsAddress(addresses[0] ?? "");
+    })();
+    localStorage.setItem("isOnboardingDone", "false");
   }, []);
 
   function handleSelection(newRole: "provider" | "user") {
@@ -59,12 +60,9 @@ export default function Onboarding() {
 
   async function handleProviderSubmit() {
     try {
-      if (!ipfsAddress || !price || !maxStorage) throw new Error("Please fill all values");
-      await registerProvider(
-        ipfsAddress,
-        maxStorage,
-        price
-      );
+      if (!ipfsAddress || !price || !maxStorage)
+        throw new Error("Please fill all values");
+      await registerProvider(ipfsAddress, maxStorage, price);
       localStorage.setItem("isOnboardingDone", "true");
       router.replace("/");
     } catch (err) {
@@ -73,16 +71,13 @@ export default function Onboarding() {
     }
   }
 
-
   return (
     <div className="flex justify-center min-h-screen">
       <div className="relative">
         <Card className="m-4 mt-8 lg:w-11/12 max-w-[1600px] max-xl:max-w-full h-fit">
           <CardHeader>
             <CardTitle className="w-full text-center text-2xl py-4">
-              <div className="font-bold">
-                Onboarding
-              </div>
+              <div className="font-bold">Onboarding</div>
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-8 items-center p-8 pt-0">
@@ -103,9 +98,11 @@ export default function Onboarding() {
                     variant={role === option ? "default" : "outline"}
                     className={cn(
                       "px-8 py-3 text-lg font-bold",
-                      role === option ? 'dark:bg-zinc-400' : ''
+                      role === option ? "dark:bg-zinc-400" : "",
                     )}
-                    onClick={() => handleSelection(option as "provider" | "user")}
+                    onClick={() =>
+                      handleSelection(option as "provider" | "user")
+                    }
                   >
                     <input
                       type="radio"
@@ -135,14 +132,18 @@ export default function Onboarding() {
                 <Input
                   value={maxStorage}
                   type="number"
-                  onChange={(e) => setMaxStorage(parseFloat(e.target.value ?? '0'))}
+                  onChange={(e) =>
+                    setMaxStorage(Number.parseFloat(e.target.value ?? "0"))
+                  }
                   placeholder="Max Storage Size (GB)"
                   className="w-full"
                 />
                 <Input
                   value={price}
                   type="number"
-                  onChange={(e) => setPrice(parseFloat(e.target.value ?? '0'))}
+                  onChange={(e) =>
+                    setPrice(Number.parseFloat(e.target.value ?? "0"))
+                  }
                   placeholder="Price per GB (ETH)"
                   className="w-full"
                 />
@@ -157,19 +158,22 @@ export default function Onboarding() {
             )}
 
             {/* Continue Button */}
-            {role === "user" && <Button
-              variant="secondary"
-              className="w-60 py-3 text-lg mt-4 transition-all"
-              onClick={handleContinue}
-            >
-              Continue
-            </Button>}
+            {role === "user" && (
+              <Button
+                variant="secondary"
+                className="w-60 py-3 text-lg mt-4 transition-all"
+                onClick={handleContinue}
+              >
+                Continue
+              </Button>
+            )}
 
             {/* Inline Error Message (below the Continue button) */}
             {error && (
               <div
-                className={`mt-2 text-red-600 text-sm font-semibold transition-opacity ${fadeError ? "opacity-100" : "opacity-0"
-                  }`}
+                className={`mt-2 text-red-600 text-sm font-semibold transition-opacity ${
+                  fadeError ? "opacity-100" : "opacity-0"
+                }`}
                 style={{ transition: "opacity 1s" }}
               >
                 {error}

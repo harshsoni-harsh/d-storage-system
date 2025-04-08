@@ -1,8 +1,8 @@
-import { AddressType, ProviderType } from "@/types/types";
-import { getMarketplaceContract, getProviderContract } from "./contracts";
-import { getAccount } from "./web3-clients";
+import type { AddressType, ProviderType } from "@/types/types";
 import { isAddressEqual, zeroAddress } from "viem";
+import { getMarketplaceContract, getProviderContract } from "./contracts";
 import { currentChain, ensureChain } from "./utils";
+import { getAccount } from "./web3-clients";
 
 export async function fetchProviderDeals(providerAddress?: AddressType) {
   if (!providerAddress) {
@@ -16,14 +16,13 @@ export async function fetchProviderDeals(providerAddress?: AddressType) {
       return await providerContract.read.getAllDeals();
     }
     throw new Error("You are not a provider");
-  } else {
-    const providerContract = await getProviderContract(providerAddress);
-    return await providerContract.read.getAllDeals();
   }
+  const providerContract = await getProviderContract(providerAddress);
+  return await providerContract.read.getAllDeals();
 }
 
 export async function getProviderDetails(
-  providerAddress: AddressType
+  providerAddress: AddressType,
 ): Promise<ProviderType> {
   const contract = await getProviderContract(providerAddress);
   const [walletAddress, pricePerSector, sectorCount, validTill, ipfsPeerId] =
@@ -47,10 +46,10 @@ export async function releasePayment(userAddress: AddressType): Promise<void> {
   const marketplaceContract = await getMarketplaceContract();
 
   try {
-    await marketplaceContract.write.releasePayment(
-      [account, userAddress],
-      { account, chain: currentChain }
-    );
+    await marketplaceContract.write.releasePayment([account, userAddress], {
+      account,
+      chain: currentChain,
+    });
     console.log("Payment released successfully");
   } catch (err) {
     console.error("Failed to release payment:", err);
