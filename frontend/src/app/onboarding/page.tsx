@@ -20,8 +20,8 @@ export default function Onboarding() {
   const [fadeError, setFadeError] = useState(false);
 
   const [ipfsAddress, setIpfsAddress] = useState("");
-  const [maxStorage, setMaxStorage] = useState(0);
-  const [price, setPrice] = useState(0);
+  const [maxStorage, setMaxStorage] = useState<number>(0);
+  const [price, setPrice] = useState<number>(0.00);
 
   const router = useRouter();
 
@@ -135,14 +135,14 @@ export default function Onboarding() {
                 <Input
                   value={maxStorage}
                   type="number"
-                  onChange={(e) => setMaxStorage(parseInt(e.target.value ?? '0'))}
+                  onChange={(e) => setMaxStorage(parseFloat(e.target.value ?? '0'))}
                   placeholder="Max Storage Size (GB)"
                   className="w-full"
                 />
                 <Input
                   value={price}
                   type="number"
-                  onChange={(e) => setPrice(parseInt(e.target.value ?? '0'))}
+                  onChange={(e) => setPrice(parseFloat(e.target.value ?? '0'))}
                   placeholder="Price per GB (ETH)"
                   className="w-full"
                 />
