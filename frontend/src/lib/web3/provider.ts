@@ -1,5 +1,5 @@
 import type { AddressType, ProviderType } from "@/types/types";
-import { isAddressEqual, zeroAddress } from "viem";
+import { formatEther, isAddressEqual, zeroAddress } from "viem";
 import { getMarketplaceContract, getProviderContract } from "./contracts";
 import { currentChain, ensureChain } from "./utils";
 import { getAccount } from "./web3-clients";
@@ -30,7 +30,7 @@ export async function getProviderDetails(
 
   return {
     providerAddress: walletAddress,
-    pricePerSector: Number(pricePerSector).toString(),
+    pricePerSector: formatEther(pricePerSector),
     sectorCount: Number(sectorCount).toString(),
     validTill: Number(validTill).toString(),
     ipfsPeerId,

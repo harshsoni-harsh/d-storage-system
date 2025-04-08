@@ -4,7 +4,7 @@ import {
   getMarketplaceContract,
   getProviderContract,
 } from "./contracts";
-import { ensureChain } from "./utils";
+import { currentChain, ensureChain } from "./utils";
 import { getAccount } from "./web3-clients";
 
 export async function fetchDealDetails(dealAddress: AddressType) {
@@ -42,7 +42,19 @@ export async function approveDeal(userAddress: AddressType) {
   const providerContract = await getProviderContract(providerAddress);
   const { request } = await providerContract.simulate.approveDeal(
     [userAddress],
-    { account },
+    { account }
   );
   await walletClient.writeContract(request);
+}
+
+export async function addCID(dealAddress: AddressType, cid: string) {
+  const dealContract = await getDealContract(dealAddress);
+  const account = await getAccount();
+  await dealContract.write.addCID([cid], { account, chain: currentChain });
+}
+
+export async function getCIDs(dealAddress: AddressType) {
+  const dealContract = await getDealContract(dealAddress);
+  const cids = await dealContract.read.getAllCIDs();
+  return cids;
 }

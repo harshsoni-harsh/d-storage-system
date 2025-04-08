@@ -3,16 +3,28 @@ import { ReactTable } from "@/components/ReactTable";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { fetchDealDetails, fetchUserDeals } from "@/lib/web3";
+import { chunkifyAndUpload } from "@/lib/utils";
+import { addCID, fetchDealDetails, fetchUserDeals, getCIDs } from "@/lib/web3";
 import type { AddressType, DealType } from "@/types/types";
 import type { Row } from "@tanstack/react-table";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+import { formatEther } from "viem";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 export default function UserDeals() {
   const [deals, setDeals] = useState<DealType[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<DealType[]>([]);
   const [filterText, setFilterText] = useState<string>("");
+  const [cidDialogOpen, setCidDialogOpen] = useState(false);
+  const [cids, setCids] = useState<readonly string[]>([]);
 
   const syncDeals = useCallback(async () => {
     try {
@@ -26,7 +38,8 @@ export default function UserDeals() {
           else if (!details.isActive) status = "Waiting for Approval";
 
           return {
-            addr: dealAddress,
+            dealAddr: dealAddress,
+            providerAddress: details.providerAddress,
             status: status,
             price: Number(details.pricePerSector),
             remainingStorage: Number(details.sectorCount),
@@ -40,6 +53,40 @@ export default function UserDeals() {
     }
   }, []);
 
+  const waitForFile = useCallback((): Promise<File | null> => {
+    return new Promise((resolve) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "*/*";
+
+      input.onchange = () => {
+        const file = input.files?.[0] ?? null;
+        resolve(file);
+      };
+
+      input.click();
+    });
+  }, []);
+
+  const handleUpload = useCallback(async (dealAddr: AddressType) => {
+    const file = await waitForFile();
+
+    if (!file) {
+      toast.error("No file selected");
+      return;
+    }
+    const cid = await chunkifyAndUpload(file);
+    if (cid) {
+      await addCID(dealAddr, cid);
+    }
+  }, [waitForFile]);
+
+  const checkCIDs = useCallback(async (dealAddr: AddressType) => {
+    const cids = await getCIDs(dealAddr);
+    setCids(cids);
+    setCidDialogOpen(true);
+  }, []);
+
   useEffect(() => {
     syncDeals();
   }, [syncDeals]);
@@ -51,14 +98,14 @@ export default function UserDeals() {
   useEffect(() => {
     setFilteredDeals(
       deals.filter((deal) =>
-        deal.addr.toLowerCase().includes(filterText.toLowerCase()),
+        deal.dealAddr.toLowerCase().includes(filterText.toLowerCase()),
       ),
     );
   }, [filterText, deals]);
 
   const columns = useMemo(
     () => [
-      { header: "Deal Address", accessorKey: "addr" },
+      { header: "Provider Address", accessorKey: "providerAddress" },
       {
         header: "Status",
         accessorKey: "status",
@@ -79,7 +126,10 @@ export default function UserDeals() {
           );
         },
       },
-      { header: "Price ($)", accessorKey: "price" },
+      {
+        header: "Price",
+        accessorFn: (row: DealType) => `${formatEther(BigInt(row.price)) ?? "N/A"} ETH`
+      },
       {
         header: "Remaining Storage (GB)",
         accessorFn: (row: DealType) => row.remainingStorage ?? "N/A",
@@ -96,13 +146,24 @@ export default function UserDeals() {
         cell: ({ row }: { row: Row<DealType> }) => {
           const isActive = row.original.status === "Active";
           return (
-            <Button
-              variant="outline"
-              disabled={!isActive}
-              className={`px-4 ${!isActive ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
-            >
-              Upload
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                disabled={!isActive}
+                onClick={() => handleUpload(row.original.dealAddr)}
+                className={`px-4 ${!isActive ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+              >
+                Upload
+              </Button>
+              <Button
+                variant="outline"
+                disabled={!isActive}
+                onClick={() => checkCIDs(row.original.dealAddr)}
+                className={`px-4 ${!isActive ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+              >
+                Check CIDs
+              </Button>
+            </div>
           );
         },
       },
@@ -139,6 +200,16 @@ export default function UserDeals() {
           <ReactTable data={filteredDeals} columns={columns} />
         </CardContent>
       </Card>
+      <Dialog open={cidDialogOpen} onOpenChange={setCidDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>CIDs</DialogTitle>
+            <DialogDescription className="whitespace-pre pt-4">
+              {JSON.stringify(cids, null, 4)}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

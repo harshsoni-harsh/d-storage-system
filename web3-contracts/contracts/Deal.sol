@@ -12,6 +12,10 @@ contract Deal {
     bool public completed;
     address public marketplace;
 
+    string[] public fileCIDs;
+
+    event CIDAdded(string cid);
+
     constructor(
         address _userAddress,
         uint256 _pricePerSector,
@@ -50,5 +54,15 @@ contract Deal {
         bool _completed
     ) {
         return (userAddress, providerAddress, pricePerSector, sectorCount, validTill, isActive, completed);
+    }
+
+    function addCID(string memory cid) external {
+        require(msg.sender == userAddress, "Only user can add CIDs");
+        fileCIDs.push(cid);
+        emit CIDAdded(cid);
+    }
+
+    function getAllCIDs() external view returns (string[] memory) {
+        return fileCIDs;
     }
 }

@@ -1,20 +1,30 @@
 import type { AddressType } from "@/types/types";
-import { isAddress, parseEther } from "viem";
-import { getMarketplaceContract } from "./contracts";
+import { isAddressEqual, parseEther, zeroAddress } from "viem";
+import { getMarketplaceContract, getProviderContract } from "./contracts";
 import { currentChain, ensureChain } from "./utils";
 import { getAccount } from "./web3-clients";
 
 export async function registerProvider(
   peerId: string,
   sectorCount: number,
-  pricePerSector: number,
+  pricePerSector: number
 ) {
   const contract = await getMarketplaceContract();
   const account = await getAccount();
 
-  const hash = await contract.write.registerProvider(
-    [peerId, BigInt(sectorCount), BigInt(pricePerSector)],
-    { account, chain: currentChain },
+  const provider_instance = await contract.read.provider_instances([account]);
+
+  if (isAddressEqual(provider_instance, zeroAddress)) {
+    const hash = await contract.write.registerProvider(
+      [peerId, BigInt(sectorCount), BigInt(pricePerSector * 1e18)],
+      { account, chain: currentChain }
+    );
+    return hash;
+  }
+  const providerContract = await getProviderContract(provider_instance);
+  const hash = await providerContract.write.updateData(
+    [peerId, BigInt(sectorCount), BigInt(pricePerSector * 1e18)],
+    { account, chain: currentChain }
   );
   return hash;
 }
@@ -35,7 +45,7 @@ export async function initiateDeal(
   providerAddress: AddressType,
   fileSize: number,
   duration: number,
-  amount: number,
+  amount: number
 ) {
   const { publicClient, walletClient } = await ensureChain();
   const marketplaceContract = await getMarketplaceContract();
@@ -47,7 +57,7 @@ export async function initiateDeal(
       {
         account,
         value: parseEther(amount.toString()),
-      },
+      }
     );
     const hash = await walletClient.writeContract(request);
     const receipt = await publicClient.waitForTransactionReceipt({ hash });

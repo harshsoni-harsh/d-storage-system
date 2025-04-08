@@ -1,7 +1,6 @@
 "use client";
 
 import { ConnectKitButton } from "connectkit";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -12,27 +11,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { registerProvider } from "@/lib/web3";
+import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 export default function Onboarding() {
   const [isClient, setIsClient] = useState(true);
   const { isConnected } = useAccount();
   const [role, setRole] = useState<"provider" | "user">("user");
-  const [error, setError] = useState("");
-  const [fadeError, setFadeError] = useState(false);
 
   const [ipfsAddress, setIpfsAddress] = useState("");
   const [maxStorage, setMaxStorage] = useState<number>(0);
   const [price, setPrice] = useState<number>(0.0);
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-
-  const showError = (msg: string) => {
-    setError(msg);
-    setFadeError(true);
-    setTimeout(() => {
-      setFadeError(false);
-    }, 2000);
-  };
 
   useEffect(() => {
     setIsClient(true);
@@ -40,7 +32,8 @@ export default function Onboarding() {
       const { addresses } = await getIpfsAddress();
       setIpfsAddress(addresses[0] ?? "");
     })();
-    localStorage.setItem("isOnboardingDone", "false");
+    document.cookie = "isOnboardingDone=; path=/; max-age=0";
+    document.cookie = "userRole=; path=/; max-age=0";
   }, []);
 
   function handleSelection(newRole: "provider" | "user") {
@@ -51,9 +44,11 @@ export default function Onboarding() {
 
   function handleContinue() {
     if (!isConnected) {
-      showError("Connect your wallet first to proceed!");
+      toast.error("Connect your wallet first to proceed!");
     } else {
-      localStorage.setItem("isOnboardingDone", "true");
+      document.cookie = "isOnboardingDone=true; path=/; max-age=31536000";
+      document.cookie = "userRole=user; path=/; max-age=31536000";
+      setLoading(true);
       router.replace("/");
     }
   }
@@ -63,11 +58,13 @@ export default function Onboarding() {
       if (!ipfsAddress || !price || !maxStorage)
         throw new Error("Please fill all values");
       await registerProvider(ipfsAddress, maxStorage, price);
-      localStorage.setItem("isOnboardingDone", "true");
+      document.cookie = "isOnboardingDone=true; path=/; max-age=31536000";
+      document.cookie = "userRole=provider; path=/; max-age=31536000";
+      setLoading(true);
       router.replace("/");
     } catch (err) {
       console.log(err);
-      showError("Error registering provider");
+      toast.error("Error registering provider");
     }
   }
 
@@ -130,7 +127,7 @@ export default function Onboarding() {
                   className="w-full"
                 />
                 <Input
-                  value={maxStorage}
+                  value={Number.isNaN(maxStorage) ? "" : String(maxStorage)}
                   type="number"
                   onChange={(e) =>
                     setMaxStorage(Number.parseFloat(e.target.value ?? "0"))
@@ -139,7 +136,7 @@ export default function Onboarding() {
                   className="w-full"
                 />
                 <Input
-                  value={price}
+                  value={Number.isNaN(price) ? "" : String(price)}
                   type="number"
                   onChange={(e) =>
                     setPrice(Number.parseFloat(e.target.value ?? "0"))
@@ -151,6 +148,7 @@ export default function Onboarding() {
                   variant="secondary"
                   className="w-60 py-3 text-lg mt-4"
                   onClick={handleProviderSubmit}
+                  disabled={Number.isNaN(maxStorage) || Number.isNaN(price)}
                 >
                   Submit Provider Details
                 </Button>
@@ -167,19 +165,12 @@ export default function Onboarding() {
                 Continue
               </Button>
             )}
-
-            {/* Inline Error Message (below the Continue button) */}
-            {error && (
-              <div
-                className={`mt-2 text-red-600 text-sm font-semibold transition-opacity ${
-                  fadeError ? "opacity-100" : "opacity-0"
-                }`}
-                style={{ transition: "opacity 1s" }}
-              >
-                {error}
-              </div>
-            )}
           </CardContent>
+          {
+            loading && <div className="pb-6">
+              <Loader />
+            </div>
+          }
         </Card>
       </div>
     </div>

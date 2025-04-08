@@ -50,14 +50,15 @@ contract Provider {
 
 
     function updateData(
-        uint256 newPrice,
-        uint256 time,
-        uint256 sectors
+        string memory _ipfsPeerId,
+        uint256 _sectorCount,
+        uint256 _pricePerSector
     ) public {
         require(msg.sender == walletAddress, "Only marketplace can initiate the deal");
-        pricePerSector = newPrice;
-        validTill = time;
-        sectorCount = sectors;
+        ipfsPeerId = _ipfsPeerId;
+        sectorCount = _sectorCount;
+        pricePerSector = _pricePerSector;
+        validTill = block.timestamp + 1 days;
     }
 
     function initiateDeal(

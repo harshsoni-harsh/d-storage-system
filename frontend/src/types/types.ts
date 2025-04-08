@@ -34,7 +34,8 @@ export type DealDialogProps = {
 
 export type DealType = {
   userAddr: AddressType;
-  addr: AddressType;
+  dealAddr: AddressType;
+  providerAddress?: AddressType
   status: "Active" | "Completed" | "Waiting for Approval" | "Cancelled";
   price: number;
   remainingStorage?: number;

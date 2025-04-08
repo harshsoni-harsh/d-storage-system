@@ -15,6 +15,7 @@ import {
 } from "@/lib/web3";
 import type { AddressType, DealType } from "@/types/types";
 import { toast } from "sonner";
+import { formatEther } from "viem";
 
 export default function ProviderDeals() {
   const [deals, setDeals] = useState<DealType[]>([]);
@@ -32,7 +33,7 @@ export default function ProviderDeals() {
   useEffect(() => {
     setFilteredDeals(
       deals.filter((deal) =>
-        deal.addr.toLowerCase().includes(filterText.toLowerCase()),
+        deal.dealAddr.toLowerCase().includes(filterText.toLowerCase()),
       ),
     );
   }, [filterText, deals]);
@@ -50,7 +51,7 @@ export default function ProviderDeals() {
 
           return {
             userAddr: details.userAddress,
-            addr: dealAddress,
+            dealAddr: dealAddress,
             status,
             price: Number(details.pricePerSector),
             remainingStorage: Number(details.sectorCount),
@@ -74,7 +75,7 @@ export default function ProviderDeals() {
       await approveDeal(userAddress);
       setDeals((prevDeals) =>
         prevDeals.map((deal) =>
-          deal.addr === userAddress ? { ...deal, status: "Active" } : deal,
+          deal.dealAddr === userAddress ? { ...deal, status: "Active" } : deal,
         ),
       );
     } catch (error) {
@@ -92,7 +93,7 @@ export default function ProviderDeals() {
 
   const columns = useMemo(
     () => [
-      { header: "User Wallet Address", accessorKey: "addr" },
+      { header: "User Wallet Address", accessorKey: "userAddr" },
       {
         header: "Status",
         accessorKey: "status",
@@ -113,7 +114,10 @@ export default function ProviderDeals() {
           );
         },
       },
-      { header: "Price ($)", accessorKey: "price" },
+      {
+        header: "Price",
+        accessorFn: (row: DealType) => `${formatEther(BigInt(row.price)) ?? "N/A"} ETH`
+      },
       {
         header: "Remaining Storage (GB)",
         accessorFn: (row: DealType) => row.remainingStorage ?? "N/A",
@@ -128,7 +132,7 @@ export default function ProviderDeals() {
       {
         header: "Actions",
         cell: ({ row }: { row: Row<DealType> }) => {
-          const { userAddr, addr, status } = row.original;
+          const { userAddr, dealAddr: addr, status } = row.original;
           const isWaitingForApproval = status === "Waiting for Approval";
           const isActive = status === "Active";
 

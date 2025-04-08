@@ -18,6 +18,7 @@ import type { PeerType, ProviderType } from "@/types/types";
 import type { ColumnDef, Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const intervals = [250, 500, 750, 1000, 2000, 5000];
 
@@ -147,12 +148,18 @@ export default function Page() {
               duration,
               storageSize,
             }: { duration: number; storageSize: number }) => {
-              await initiateDeal(
-                row.original.walletAddress,
-                storageSize,
-                duration,
-                storageSize * Number(row.original.price),
-              );
+              try {
+                await initiateDeal(
+                  row.original.walletAddress,
+                  storageSize,
+                  duration,
+                  storageSize * Number(row.original.price),
+                );
+                toast.success("Created deal successfully");
+              } catch (err) {
+                toast.error(err instanceof Error ? err.message : "Error creating deal. Check console.")
+                throw err;
+              }
             }}
           />
         ),
