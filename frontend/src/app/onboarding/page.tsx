@@ -53,6 +53,8 @@ export default function Onboarding() {
       showError("Connect your wallet first to proceed!");
     } else {
       localStorage.setItem("isOnboardingDone", "true");
+      localStorage.setItem("userRole", "user");
+      document.cookie = "isOnboardingDone=true; path=/";
       router.replace("/");
     }
   }
@@ -66,6 +68,8 @@ export default function Onboarding() {
         price
       );
       localStorage.setItem("isOnboardingDone", "true");
+      localStorage.setItem("userRole", "provider"); 
+      document.cookie = "isOnboardingDone=true; path=/",
       router.replace("/");
     } catch (err) {
       console.log(err);
