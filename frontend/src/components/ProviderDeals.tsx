@@ -155,7 +155,7 @@ export default function ProviderDeals() {
                 className={`px-4 ${(!isWaitingForApproval && !isActive) ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                 onClick={() => handleReleaseDeal(userAddr)}
               >
-                Cancel
+                Release Payment
               </Button>
             </div>
           );
