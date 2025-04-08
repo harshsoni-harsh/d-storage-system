@@ -16,6 +16,7 @@ import DealDialog from "@/components/ui/ConnectionDialogCreateDeal"
 import { initiateDeal, getProviderDetails, getProviders } from '@/lib/web3';
 import { PeerType, ProviderType } from '@/types/types';
 import { getPeerLatency, getPeerStats } from '@/app/actions';
+import Loader from '@/components/Loader';
 
 const intervals = [250, 500, 750, 1000, 2000, 5000];
 
@@ -27,6 +28,7 @@ export default function Page() {
   const [filteredPeers, setFilteredPeers] = useState<PeerType[]>([]);
   const [filterText, setFilterText] = useState<string>('');
   const [syncInterval, setSyncInterval] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     syncProviders();
@@ -53,6 +55,7 @@ export default function Page() {
   }, [filterText]);
 
   async function syncProviders() {
+    setLoading(true);
     const providers = await getProviders();
     if (Array.isArray(providers)) {
       const providersDetails = await Promise.all(providers.map(async (provider) => {
@@ -61,6 +64,7 @@ export default function Page() {
       setProviders(providersDetails);
       await syncPeers(providersDetails);
     }
+    setLoading(false);
   }
   async function syncPeers(providersProp?: ProviderType[]) {
     const providerData = providersProp ?? providers ?? [];
@@ -128,7 +132,7 @@ export default function Page() {
             peer={row.original.peer}
             addr={row.original.addr}
             price={row.original.price}
-            onCreateDeal={async ({duration, storageSize}: {duration: number, storageSize: number}) => {
+            onCreateDeal={async ({ duration, storageSize }: { duration: number, storageSize: number }) => {
               await initiateDeal(row.original.walletAddress, storageSize, duration, storageSize * Number(row.original.price));
             }}
           />
@@ -182,7 +186,11 @@ export default function Page() {
               <Image src='/icons/sync.svg' height={16} width={16} alt='Sync' className="dark:invert" />
             </Button>
           </div>
-          <ReactTable data={filteredPeers} columns={columns} />
+          {
+            loading ? <Loader /> : filteredPeers.length > 0 ?
+              <ReactTable data={filteredPeers} columns={columns} /> :
+              <div className='text-center p-4'>No providers found</div>
+          }
         </CardContent>
       </Card>
     </div>

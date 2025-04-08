@@ -58,7 +58,7 @@ export default function DealDialog({ peer, addr, price, onCreateDeal, text }: De
                             id="storage-size"
                             type="number"
                             value={storageSize}
-                            onChange={(e) => setStorageSize(parseInt(e.target.value))}
+                            onChange={(e) => setStorageSize(parseInt(e.target.value ?? 0))}
                             placeholder="Enter storage size (e.g. 10 or 10.50)"
                             className="mt-1"
                         />
@@ -70,7 +70,7 @@ export default function DealDialog({ peer, addr, price, onCreateDeal, text }: De
                             id="duration"
                             type="number"
                             value={duration}
-                            onChange={(e) => setDuration(parseInt(e.target.value))}
+                            onChange={(e) => setDuration(parseInt(e.target.value ?? 0))}
                             placeholder="Enter duration in days (e.g. 30)"
                             className="mt-1"
                         />

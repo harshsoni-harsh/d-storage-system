@@ -35,18 +35,20 @@ contract Deal {
 
     function completeDeal() external {
         require(msg.sender == marketplace, "Only marketplace can call the deal");
-        require(block.timestamp >= validTill, "Deal duration not ended");
+        // require(block.timestamp >= validTill, "Deal duration not ended");
         require(completed != true, "Deal is already completed");
         completed = true;
     }
 
     function getDealInfo() external view returns (
+        address _userAddress,
+        address _providerAddress,
         uint256 _pricePerSector,
         uint256 _sectorCount,
         uint256 _validTill,
         bool _isActive,
         bool _completed
     ) {
-        return (pricePerSector, sectorCount, validTill, isActive, completed);
+        return (userAddress, providerAddress, pricePerSector, sectorCount, validTill, isActive, completed);
     }
 }

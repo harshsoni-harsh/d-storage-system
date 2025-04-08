@@ -2,6 +2,7 @@ import { AddressType, ProviderType } from "@/types/types";
 import { getMarketplaceContract, getProviderContract } from "./contracts";
 import { getAccount } from "./web3-clients";
 import { isAddressEqual, zeroAddress } from "viem";
+import { currentChain, ensureChain } from "./utils";
 
 export async function fetchProviderDeals(providerAddress?: AddressType) {
   if (!providerAddress) {
@@ -35,4 +36,24 @@ export async function getProviderDetails(
     validTill: Number(validTill).toString(),
     ipfsPeerId,
   };
+}
+
+export async function releasePayment(userAddress: AddressType): Promise<void> {
+  const account = await getAccount();
+  if (!account || !userAddress) {
+    throw new Error("Both provider and user addresses are required.");
+  }
+
+  const marketplaceContract = await getMarketplaceContract();
+
+  try {
+    await marketplaceContract.write.releasePayment(
+      [account, userAddress],
+      { account, chain: currentChain }
+    );
+    console.log("Payment released successfully");
+  } catch (err) {
+    console.error("Failed to release payment:", err);
+    throw err;
+  }
 }

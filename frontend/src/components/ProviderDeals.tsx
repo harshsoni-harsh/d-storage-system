@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-import { fetchProviderDeals, fetchDealDetails, approveDeal } from '@/lib/web3';
+import { fetchProviderDeals, fetchDealDetails, approveDeal, releasePayment } from '@/lib/web3';
 import { AddressType, ProviderDealType } from '@/types/types';
 import { toast } from '@/hooks/use-toast';
 
@@ -41,6 +41,7 @@ export default function ProviderDeals() {
           else if (!details.isActive) status = 'Waiting for Approval';
 
           return ({
+            userAddr: details.userAddress,
             addr: dealAddress,
             status,
             price: Number(details.pricePerSector),
@@ -89,8 +90,8 @@ export default function ProviderDeals() {
     }
   }
 
-  async function handleCancelDeal(dealAddress: AddressType) {
-
+  async function handleReleaseDeal(userAddress: AddressType) {
+    await releasePayment(userAddress);
   }
 
   const columns = useMemo(
@@ -131,7 +132,7 @@ export default function ProviderDeals() {
       {
         header: 'Actions',
         cell: ({ row }: { row: any }) => {
-          const { addr, status } = row.original;
+          const { userAddr, addr, status } = row.original;
           const isWaitingForApproval = status === 'Waiting for Approval';
           const isActive = status === 'Active';
 
@@ -149,10 +150,10 @@ export default function ProviderDeals() {
 
               {/* Cancel Deal Button */}
               <Button
-                variant="destructive"
+                variant="default"
                 disabled={!isWaitingForApproval && !isActive}
                 className={`px-4 ${(!isWaitingForApproval && !isActive) ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                onClick={() => handleCancelDeal(addr)}
+                onClick={() => handleReleaseDeal(userAddr)}
               >
                 Cancel
               </Button>

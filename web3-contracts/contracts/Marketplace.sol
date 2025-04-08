@@ -92,9 +92,12 @@ contract Marketplace {
         emit DealCreated(msg.sender, _provider);
     }
 
-    function releasePayment(address _providerAddress, address _userAddress) external {
+    function releasePayment(address _providerAddress, address _userAddress) external payable {
+        require(provider_instances[_providerAddress] != address(0), "Provider doesn't exist");
         Provider provider = Provider(provider_instances[_providerAddress]);
         address dealAddress = provider.dealsMapped(_userAddress);
+        
+        require(dealAddress != address(0), "Deal doesn't exist");
         Deal deal = Deal(dealAddress);
 
         require(deal.isActive(), "Deal not active yet!");

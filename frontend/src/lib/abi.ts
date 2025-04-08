@@ -64,6 +64,16 @@ export const DealABI = [
     "name": "getDealInfo",
     "outputs": [
       {
+        "internalType": "address",
+        "name": "_userAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_providerAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_pricePerSector",
         "type": "uint256"
@@ -368,7 +378,7 @@ export const MarketplaceABI = [
     ],
     "name": "releasePayment",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   }
 ] as const;

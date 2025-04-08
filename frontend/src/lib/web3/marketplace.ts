@@ -37,20 +37,20 @@ export async function initiateDeal(
   duration: number,
   amount: number
 ) {
-  const { publicClient } = await ensureChain();
+  const { publicClient, walletClient } = await ensureChain();
   const marketplaceContract = await getMarketplaceContract();
   const account = await getAccount();
 
   try {
-    const hash = await marketplaceContract.write.initiateDeal([
+    const {request} = await marketplaceContract.simulate.initiateDeal([
       providerAddress,
       BigInt(fileSize),
       BigInt(duration),
     ], {
       account,
       value: parseEther(amount.toString()),
-      chain: currentChain
     });
+    const hash = await walletClient.writeContract(request);
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
     console.log("Transaction confirmed:", receipt);
     return true;
@@ -58,6 +58,7 @@ export async function initiateDeal(
     if (err.message.includes("revert")) {
       const revertReason = err.message.match(/revert (.+)/);
       console.log("Revert Reason:", revertReason?.[1] || err.message);
+      throw err;
     } else {
       throw new Error("Can't create deal with this provider", err);
     }

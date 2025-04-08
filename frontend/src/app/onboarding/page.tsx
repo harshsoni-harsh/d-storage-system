@@ -135,14 +135,14 @@ export default function Onboarding() {
                 <Input
                   value={maxStorage}
                   type="number"
-                  onChange={(e) => setMaxStorage(parseInt(e.target.value))}
+                  onChange={(e) => setMaxStorage(parseInt(e.target.value ?? '0'))}
                   placeholder="Max Storage Size (GB)"
                   className="w-full"
                 />
                 <Input
                   value={price}
                   type="number"
-                  onChange={(e) => setPrice(parseInt(e.target.value))}
+                  onChange={(e) => setPrice(parseInt(e.target.value ?? '0'))}
                   placeholder="Price per GB (ETH)"
                   className="w-full"
                 />

@@ -9,10 +9,19 @@ import { getAccount } from "./web3-clients";
 
 export async function fetchDealDetails(dealAddress: AddressType) {
   const dealContract = await getDealContract(dealAddress);
-  const [pricePerSector, sectorCount, validTill, isActive, completed] =
-    await dealContract.read.getDealInfo();
+  const [
+    userAddress,
+    providerAddress,
+    pricePerSector,
+    sectorCount,
+    validTill,
+    isActive,
+    completed,
+  ] = await dealContract.read.getDealInfo();
 
   return {
+    userAddress,
+    providerAddress,
     pricePerSector,
     sectorCount,
     validTill,
