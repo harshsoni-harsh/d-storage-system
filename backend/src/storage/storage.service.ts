@@ -102,4 +102,15 @@ export class StorageService {
       throw err;
     }
   }
+  async removePin(cid: string) {
+    try {
+      await this.ipfsClient.pin.rm(cid);
+      Logger.debug(`Removed pin: ${cid}`);
+    } catch (err) {
+      Logger.error(
+        `Error removing pin: ${err instanceof Error ? err.message : err}`
+      );
+      throw err;
+    }
+  }
 }

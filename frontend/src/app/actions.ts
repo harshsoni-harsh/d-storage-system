@@ -130,3 +130,16 @@ export async function pinCID(cid: string) {
     console.error(err);
   }
 }
+export async function unpin(cid: string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/storage/unpin?cid=${cid}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to connect backend");
+    }
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+}

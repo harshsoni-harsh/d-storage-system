@@ -3,9 +3,9 @@ import { ReactTable } from "@/components/ReactTable";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import type { Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Row } from "@tanstack/react-table";
 
 import {
   approveDeal,

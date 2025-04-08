@@ -115,5 +115,11 @@ export class StorageController {
   ) {
     return await this.storageService.pinFile(cid);
   }
-
+  
+  @Get("/unpin")
+  async removePin(
+    @Query("cid") cid: string,
+  ) {
+    return await this.storageService.removePin(cid);
+  }
 }
