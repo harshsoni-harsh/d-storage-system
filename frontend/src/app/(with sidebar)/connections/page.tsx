@@ -137,7 +137,7 @@ export default function Page() {
               />
             </Button>
           </div>
-          <ReactTable data={filteredPeers} columns={columns} />
+          <ReactTable data={filteredPeers} columns={columns} sortBy="latency" />
         </CardContent>
       </Card>
     </div>

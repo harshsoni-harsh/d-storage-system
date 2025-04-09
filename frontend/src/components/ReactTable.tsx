@@ -22,12 +22,13 @@ import {
 interface ReactTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
+  sortBy: string;
 }
 
-const ReactTable = <T,>({ columns, data }: ReactTableProps<T>) => {
+const ReactTable = <T,>({ columns, data, sortBy = "price" }: ReactTableProps<T>) => {
   const [sorting, setSorting] = useState([
     {
-      id: "addr",
+      id: sortBy,
       desc: false,
     },
   ]);

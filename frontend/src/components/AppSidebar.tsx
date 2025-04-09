@@ -15,8 +15,7 @@ import { ConnectKitButton } from "connectkit";
 import { CircuitBoard, Home } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggler";
 
 const items = [
@@ -45,13 +44,6 @@ const items = [
 export function AppSidebar() {
   const { theme } = useTheme() as { theme: "light" | "dark" | undefined };
   const path = usePathname();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (localStorage.getItem("isOnboardingDone") !== "true") {
-      router.push("/onboarding");
-    }
-  });
 
   return (
     <Sidebar className="max-w-48">

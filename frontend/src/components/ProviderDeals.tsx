@@ -191,7 +191,7 @@ export default function ProviderDeals() {
               />
             </Button>
           </div>
-          <ReactTable data={filteredDeals} columns={columns} />
+          <ReactTable data={filteredDeals} columns={columns} sortBy="status" />
         </CardContent>
       </Card>
     </div>

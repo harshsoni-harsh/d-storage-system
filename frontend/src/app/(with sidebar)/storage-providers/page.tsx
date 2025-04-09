@@ -224,7 +224,7 @@ export default function Page() {
           {loading ? (
             <Loader />
           ) : filteredPeers.length > 0 ? (
-            <ReactTable data={filteredPeers} columns={columns} />
+            <ReactTable data={filteredPeers} columns={columns} sortBy="latency" />
           ) : (
             <div className="text-center p-4">No providers found</div>
           )}

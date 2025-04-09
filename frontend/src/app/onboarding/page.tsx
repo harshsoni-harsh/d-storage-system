@@ -24,16 +24,12 @@ export default function Onboarding() {
   const [price, setPrice] = useState<number>(0.0);
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
-
   useEffect(() => {
     setIsClient(true);
     (async () => {
       const { addresses } = await getIpfsAddress();
       setIpfsAddress(addresses[0] ?? "");
     })();
-    document.cookie = "isOnboardingDone=; path=/; max-age=0";
-    document.cookie = "userRole=; path=/; max-age=0";
   }, []);
 
   function handleSelection(newRole: "provider" | "user") {
@@ -49,7 +45,7 @@ export default function Onboarding() {
       document.cookie = "isOnboardingDone=true; path=/; max-age=31536000";
       document.cookie = "userRole=user; path=/; max-age=31536000";
       setLoading(true);
-      router.replace("/");
+      window.location.href = "/";
     }
   }
 
@@ -61,7 +57,7 @@ export default function Onboarding() {
       document.cookie = "isOnboardingDone=true; path=/; max-age=31536000";
       document.cookie = "userRole=provider; path=/; max-age=31536000";
       setLoading(true);
-      router.replace("/");
+      window.location.href = "/";
     } catch (err) {
       console.log(err);
       toast.error("Error registering provider");

@@ -197,7 +197,7 @@ export default function UserDeals() {
               />
             </Button>
           </div>
-          <ReactTable data={filteredDeals} columns={columns} />
+          <ReactTable data={filteredDeals} columns={columns} sortBy="status" />
         </CardContent>
       </Card>
       <Dialog open={cidDialogOpen} onOpenChange={setCidDialogOpen}>
