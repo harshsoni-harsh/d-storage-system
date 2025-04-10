@@ -147,7 +147,10 @@ export default function Page() {
             onCreateDeal={async ({
               duration,
               storageSize,
-            }: { duration: number; storageSize: number }) => {
+            }: {
+              duration: number;
+              storageSize: number;
+            }) => {
               try {
                 await initiateDeal(
                   row.original.walletAddress,
@@ -157,7 +160,11 @@ export default function Page() {
                 );
                 toast.success("Created deal successfully");
               } catch (err) {
-                toast.error(err instanceof Error ? err.message : "Error creating deal. Check console.")
+                toast.error(
+                  err instanceof Error
+                    ? err.message
+                    : "Error creating deal. Check console.",
+                );
                 throw err;
               }
             }}
@@ -224,7 +231,11 @@ export default function Page() {
           {loading ? (
             <Loader />
           ) : filteredPeers.length > 0 ? (
-            <ReactTable data={filteredPeers} columns={columns} sortBy="latency" />
+            <ReactTable
+              data={filteredPeers}
+              columns={columns}
+              sortBy="Latency"
+            />
           ) : (
             <div className="text-center p-4">No providers found</div>
           )}

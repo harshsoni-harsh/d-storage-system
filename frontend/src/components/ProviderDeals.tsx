@@ -9,21 +9,20 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   approveDeal,
-  fetchDealDetails,
-  fetchProviderDeals,
   releasePayment,
 } from "@/lib/web3";
 import type { AddressType, DealType } from "@/types/types";
 import { toast } from "sonner";
 import { formatEther } from "viem";
+import providerStore from "@/stores/providerStore";
 
 export default function ProviderDeals() {
-  const [deals, setDeals] = useState<DealType[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<DealType[]>([]);
   const [filterText, setFilterText] = useState<string>("");
+  const {deals, fetchDeals, activateDeal} = providerStore();
 
   useEffect(() => {
-    syncDeals();
+    fetchDeals();
   }, []);
 
   useEffect(() => {
@@ -38,46 +37,10 @@ export default function ProviderDeals() {
     );
   }, [filterText, deals]);
 
-  async function syncDeals() {
-    try {
-      const deals = await fetchProviderDeals();
-      const dealsData = (await Promise.all(
-        deals.map(async (dealAddress: AddressType): Promise<DealType> => {
-          const details = await fetchDealDetails(dealAddress);
-
-          let status: DealType["status"] = "Active";
-          if (details.completed) status = "Completed";
-          else if (!details.isActive) status = "Waiting for Approval";
-
-          return {
-            userAddr: details.userAddress,
-            dealAddr: dealAddress,
-            status,
-            price: Number(details.pricePerSector),
-            remainingStorage: Number(details.sectorCount),
-            validTill: Number(details.validTill),
-          } as DealType;
-        }),
-      )) as DealType[];
-
-      setDeals(dealsData);
-    } catch (error) {
-      toast.error("Error syncing deals");
-      console.error(
-        "Error syncing deals:",
-        error instanceof Error ? error.message : error,
-      );
-    }
-  }
-
   const handleConfirmDeal = useCallback(async (userAddress: AddressType) => {
     try {
       await approveDeal(userAddress);
-      setDeals((prevDeals) =>
-        prevDeals.map((deal) =>
-          deal.dealAddr === userAddress ? { ...deal, status: "Active" } : deal,
-        ),
-      );
+      activateDeal(userAddress);
     } catch (error) {
       toast.error("Failed to confirm deal");
       console.error(
@@ -181,7 +144,7 @@ export default function ProviderDeals() {
               onChange={(e) => setFilterText(e.target.value)}
               placeholder="Filter Deals..."
             />
-            <Button variant={"outline"} className="w-8 p-0" onClick={syncDeals}>
+            <Button variant={"outline"} className="w-8 p-0" onClick={fetchDeals}>
               <Image
                 src="/icons/sync.svg"
                 height={16}

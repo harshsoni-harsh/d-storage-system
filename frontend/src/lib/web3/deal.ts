@@ -6,6 +6,7 @@ import {
 } from "./contracts";
 import { currentChain, ensureChain } from "./utils";
 import { getAccount } from "./web3-clients";
+import { DealABI } from "@/lib/abi";
 
 export async function fetchDealDetails(dealAddress: AddressType) {
   const dealContract = await getDealContract(dealAddress);
@@ -57,4 +58,15 @@ export async function getCIDs(dealAddress: AddressType) {
   const dealContract = await getDealContract(dealAddress);
   const cids = await dealContract.read.getAllCIDs();
   return cids;
+}
+
+export async function listenCID(dealAddress: AddressType) {
+  const { publicClient } = await ensureChain();
+  const unwatch = publicClient.watchContractEvent({
+    address: `${dealAddress}`,
+    abi: DealABI,
+    eventName: "CIDAdded",
+    onLogs: (logs) => console.log(logs),
+  });
+  return unwatch;
 }
