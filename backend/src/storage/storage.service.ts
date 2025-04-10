@@ -90,11 +90,12 @@ export class StorageService {
     }
   }
 
-  async pinFile(cid: string) {
+  async pinFile(cid: string): Promise<CID> {
     try {
       Logger.debug(`Pinning file: ${cid}`);
       const res = await this.ipfsClient.pin.add(cid);
       Logger.debug(`Pinned file: ${cid}`);
+      return res;
     } catch (err) {
       Logger.error(
         `Error pinning file: ${err instanceof Error ? err.message : err}`
