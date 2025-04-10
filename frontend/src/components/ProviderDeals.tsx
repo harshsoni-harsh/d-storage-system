@@ -9,17 +9,18 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   approveDeal,
+  listenDeals,
   releasePayment,
 } from "@/lib/web3";
 import type { AddressType, DealType } from "@/types/types";
 import { toast } from "sonner";
-import { formatEther } from "viem";
+import { formatEther, WatchContractEventReturnType } from "viem";
 import providerStore from "@/stores/providerStore";
 
 export default function ProviderDeals() {
   const [filteredDeals, setFilteredDeals] = useState<DealType[]>([]);
   const [filterText, setFilterText] = useState<string>("");
-  const {deals, fetchDeals, activateDeal} = providerStore();
+  const { deals, fetchDeals, activateDeal } = providerStore();
 
   useEffect(() => {
     fetchDeals();
@@ -28,6 +29,16 @@ export default function ProviderDeals() {
   useEffect(() => {
     if (!filterText) setFilteredDeals(deals);
   }, [deals, filterText]);
+
+  useEffect(() => {
+    let unwatchers: WatchContractEventReturnType[] = [];
+    if (deals.length > 0) {
+      listenDeals(deals).then(data => unwatchers = data);
+    }
+    return () => {
+      unwatchers.forEach(unwatch => unwatch());
+    }
+  }, [deals])
 
   useEffect(() => {
     setFilteredDeals(

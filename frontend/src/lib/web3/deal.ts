@@ -1,4 +1,4 @@
-import type { AddressType } from "@/types/types";
+import type { AddressType, DealType } from "@/types/types";
 import {
   getDealContract,
   getMarketplaceContract,
@@ -7,6 +7,8 @@ import {
 import { currentChain, ensureChain } from "./utils";
 import { getAccount } from "./web3-clients";
 import { DealABI } from "@/lib/abi";
+import { WatchContractEventReturnType } from "viem";
+import { pinCID } from "@/app/actions";
 
 export async function fetchDealDetails(dealAddress: AddressType) {
   const dealContract = await getDealContract(dealAddress);
@@ -60,13 +62,32 @@ export async function getCIDs(dealAddress: AddressType) {
   return cids;
 }
 
-export async function listenCID(dealAddress: AddressType) {
+export async function listenDeals(
+  deals: DealType[]
+): Promise<WatchContractEventReturnType[]> {
   const { publicClient } = await ensureChain();
-  const unwatch = publicClient.watchContractEvent({
-    address: `${dealAddress}`,
-    abi: DealABI,
-    eventName: "CIDAdded",
-    onLogs: (logs) => console.log(logs),
+
+  return deals.map((deal) => {
+    return publicClient.watchContractEvent({
+      address: `${deal.dealAddr}`,
+      abi: DealABI,
+      eventName: "CIDAdded",
+      onLogs: async (logs) => {
+        for (const log of logs) {
+          const cid = log.args.cid;
+          if (cid) {
+            console.log(`pinning ${cid}`);
+            try {
+              await pinCID(cid);
+            } catch (err) {
+              console.error(
+                `Error pinning ${cid}`,
+                err instanceof Error ? err.message : err
+              );
+            }
+          }
+        }
+      },
+    });
   });
-  return unwatch;
 }
