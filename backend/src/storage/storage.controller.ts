@@ -16,6 +16,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { promises as fsPromises, createReadStream } from "fs";
+import { CID } from "kubo-rpc-client";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -112,7 +113,7 @@ export class StorageController {
   @Get("/pinCID")
   async pinCID(
     @Query("cid") cid: string,
-  ) {
+  ) : Promise<CID> {
     return await this.storageService.pinFile(cid);
   }
   

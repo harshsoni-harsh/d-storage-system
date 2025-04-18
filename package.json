@@ -1,0 +1,18 @@
+{
+  "name": "d-storage-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint:all": "pnpm --filter frontend lint && pnpm --filter backend lint",
+    "format:all": "pnpm --filter frontend format && pnpm --filter backend format",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.5.2",
+  "dependencies": {
+    "husky": "^9.1.7"
+  }
+}

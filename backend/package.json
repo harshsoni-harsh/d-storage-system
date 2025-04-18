@@ -7,7 +7,9 @@
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",
-    "prod": "node ."
+    "prod": "node .",
+    "lint": "biome lint .",
+    "format": "pnpm biome check --linter-enabled=false --organize-imports-enabled=true --write ."
   },
   "keywords": [],
   "author": "",
