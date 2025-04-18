@@ -1,7 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
-import { IPFSService } from './ipfs.service.js';
+import { Controller, Get } from "@nestjs/common";
+import { IPFSService } from "./ipfs.service.js";
 
-@Controller('ipfs')
+@Controller("ipfs")
 export class IPFSController {
   constructor(private readonly ipfsService: IPFSService) {}
 

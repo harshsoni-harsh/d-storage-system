@@ -25,7 +25,11 @@ interface ReactTableProps<T> {
   sortBy: string;
 }
 
-const ReactTable = <T,>({ columns, data, sortBy = "price" }: ReactTableProps<T>) => {
+const ReactTable = <T,>({
+  columns,
+  data,
+  sortBy = "price",
+}: ReactTableProps<T>) => {
   const [sorting, setSorting] = useState([
     {
       id: sortBy,

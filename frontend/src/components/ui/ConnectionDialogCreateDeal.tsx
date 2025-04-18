@@ -77,7 +77,9 @@ export default function DealDialog({
               id="storage-size"
               type="number"
               value={Number.isNaN(storageSize) ? "" : String(storageSize)}
-              onChange={(e) => setStorageSize(Number.parseInt(e.target.value ?? 0))}
+              onChange={(e) =>
+                setStorageSize(Number.parseInt(e.target.value ?? 0))
+              }
               placeholder="Enter storage size (e.g. 10 or 10.50)"
               className="mt-1"
             />
@@ -94,7 +96,9 @@ export default function DealDialog({
               id="duration"
               type="number"
               value={Number.isNaN(duration) ? "" : String(duration)}
-              onChange={(e) => setDuration(Number.parseInt(e.target.value ?? 0))}
+              onChange={(e) =>
+                setDuration(Number.parseInt(e.target.value ?? 0))
+              }
               placeholder="Enter duration in days (e.g. 30)"
               className="mt-1"
             />

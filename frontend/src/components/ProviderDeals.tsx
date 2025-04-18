@@ -7,15 +7,11 @@ import type { Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import {
-  approveDeal,
-  listenDeals,
-  releasePayment,
-} from "@/lib/web3";
+import { approveDeal, listenDeals, releasePayment } from "@/lib/web3";
+import providerStore from "@/stores/providerStore";
 import type { AddressType, DealType } from "@/types/types";
 import { toast } from "sonner";
-import { formatEther, WatchContractEventReturnType } from "viem";
-import providerStore from "@/stores/providerStore";
+import { WatchContractEventReturnType, formatEther } from "viem";
 
 export default function ProviderDeals() {
   const [filteredDeals, setFilteredDeals] = useState<DealType[]>([]);
@@ -33,12 +29,12 @@ export default function ProviderDeals() {
   useEffect(() => {
     let unwatchers: WatchContractEventReturnType[] = [];
     if (deals.length > 0) {
-      listenDeals(deals).then(data => unwatchers = data);
+      listenDeals(deals).then((data) => (unwatchers = data));
     }
     return () => {
-      unwatchers.forEach(unwatch => unwatch());
-    }
-  }, [deals])
+      unwatchers.forEach((unwatch) => unwatch());
+    };
+  }, [deals]);
 
   useEffect(() => {
     setFilteredDeals(
@@ -90,7 +86,8 @@ export default function ProviderDeals() {
       },
       {
         header: "Price",
-        accessorFn: (row: DealType) => `${formatEther(BigInt(row.price)) ?? "N/A"} ETH`
+        accessorFn: (row: DealType) =>
+          `${formatEther(BigInt(row.price)) ?? "N/A"} ETH`,
       },
       {
         header: "Remaining Storage (GB)",
@@ -155,7 +152,11 @@ export default function ProviderDeals() {
               onChange={(e) => setFilterText(e.target.value)}
               placeholder="Filter Deals..."
             />
-            <Button variant={"outline"} className="w-8 p-0" onClick={fetchDeals}>
+            <Button
+              variant={"outline"}
+              className="w-8 p-0"
+              onClick={fetchDeals}
+            >
               <Image
                 src="/icons/sync.svg"
                 height={16}

@@ -3,8 +3,7 @@ import { IPFSService } from "../ipfs/ipfs.service.js";
 
 @Injectable()
 export class PeersService {
-
-  constructor(private readonly ipfsService: IPFSService) { }
+  constructor(private readonly ipfsService: IPFSService) {}
 
   private get ipfsClient() {
     return this.ipfsService.ipfsClient;
@@ -45,13 +44,13 @@ export class PeersService {
       const pingResults = this.ipfsClient.ping(peerAddress);
       for await (const res of pingResults) {
         if (res.time) {
-          Logger.log(`Latency of ${peerAddress}: ${res.time} ms`)
+          Logger.log(`Latency of ${peerAddress}: ${res.time} ms`);
           return `${res.time} ms`;
         } else if (!res.success) {
           Logger.debug(`Ping failed: ${res.text}`);
-          throw new Error('Ping failed');
+          throw new Error("Ping failed");
         } else {
-          throw new Error('Ping failed');
+          throw new Error("Ping failed");
         }
       }
     } catch (error) {

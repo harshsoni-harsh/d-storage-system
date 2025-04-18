@@ -7,13 +7,14 @@ export default function Main() {
   const [type, setType] = useState<"user" | "provider" | null>(null);
 
   useEffect(() => {
-    const cookies = document.cookie
-      .split("; ")
-      .reduce((acc, cookie) => {
+    const cookies = document.cookie.split("; ").reduce(
+      (acc, cookie) => {
         const [key, value] = cookie.split("=");
         acc[key] = value;
         return acc;
-      }, {} as Record<string, string>);
+      },
+      {} as Record<string, string>,
+    );
 
     const storedRole = cookies["userRole"];
 

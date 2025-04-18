@@ -1,22 +1,22 @@
-import {
-  Controller,
-  Post,
-  Get,
-  UploadedFile,
-  Body,
-  UseInterceptors,
-  Query,
-  HttpException,
-  HttpStatus,
-  StreamableFile,
-  Logger,
-} from "@nestjs/common";
-import { StorageService } from "./storage.service.js";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { createReadStream, promises as fsPromises } from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
-import { promises as fsPromises, createReadStream } from "fs";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Post,
+  Query,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
+} from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { CID } from "kubo-rpc-client";
+import { StorageService } from "./storage.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,7 +25,7 @@ const __dirname = path.dirname(__filename);
 export class StorageController {
   private readonly storagePath = path.join(__dirname, "..", "..", "uploads");
 
-  constructor(private readonly storageService: StorageService) { }
+  constructor(private readonly storageService: StorageService) {}
 
   @Post("/upload-chunk")
   @UseInterceptors(FileInterceptor("file"))
@@ -33,20 +33,31 @@ export class StorageController {
     @UploadedFile() file: Express.Multer.File,
     @Body("chunkIndex") chunkIndex: string,
     @Body("totalChunks") totalChunks: string,
-    @Body("fileName") fileName: string
+    @Body("fileName") fileName: string,
   ): Promise<{ message: string; cid?: string }> {
     if (!file) {
       throw new HttpException("No file uploaded", HttpStatus.BAD_REQUEST);
     }
     if (!chunkIndex || !totalChunks || !fileName) {
-      throw new HttpException("Missing required fields", HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        "Missing required fields",
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const chunkIdx = parseInt(chunkIndex, 10);
     const totalChunksNum = parseInt(totalChunks, 10);
 
-    if (isNaN(chunkIdx) || isNaN(totalChunksNum) || chunkIdx < 0 || totalChunksNum <= 0) {
-      throw new HttpException("Invalid chunk index or total chunks", HttpStatus.BAD_REQUEST);
+    if (
+      isNaN(chunkIdx) ||
+      isNaN(totalChunksNum) ||
+      chunkIdx < 0 ||
+      totalChunksNum <= 0
+    ) {
+      throw new HttpException(
+        "Invalid chunk index or total chunks",
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     await this.ensureStorageDirectory();
@@ -67,7 +78,10 @@ export class StorageController {
         return { message: "File upload complete", cid };
       } catch (error) {
         Logger.error("Error storing file:", error);
-        throw new HttpException("Failed to store file", HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          "Failed to store file",
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
 
@@ -77,7 +91,7 @@ export class StorageController {
   @Get("/getById")
   async retrieveFile(
     @Query("cid") cid: string,
-    @Query("addr") addr?: string
+    @Query("addr") addr?: string,
   ): Promise<StreamableFile> {
     if (!cid) {
       throw new HttpException("CID is required", HttpStatus.BAD_REQUEST);
@@ -92,7 +106,10 @@ export class StorageController {
       });
     } catch (error) {
       Logger.error("Error retrieving file:", error);
-      throw new HttpException("File retrieval failed", HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        "File retrieval failed",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -101,7 +118,10 @@ export class StorageController {
       await fsPromises.mkdir(this.storagePath, { recursive: true });
     } catch (error) {
       Logger.error("Error ensuring storage directory:", error);
-      throw new HttpException("Failed to create storage directory", HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        "Failed to create storage directory",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -111,16 +131,12 @@ export class StorageController {
   }
 
   @Get("/pinCID")
-  async pinCID(
-    @Query("cid") cid: string,
-  ) : Promise<CID> {
+  async pinCID(@Query("cid") cid: string): Promise<CID> {
     return await this.storageService.pinFile(cid);
   }
-  
+
   @Get("/unpin")
-  async removePin(
-    @Query("cid") cid: string,
-  ) {
+  async removePin(@Query("cid") cid: string) {
     return await this.storageService.removePin(cid);
   }
 }

@@ -1,7 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common";
 import * as path from "path";
 import { Readable } from "stream";
 import { fileURLToPath } from "url";
+import { Injectable, Logger } from "@nestjs/common";
 import { CID } from "kubo-rpc-client";
 import { IPFSService } from "../ipfs/ipfs.service.js";
 
@@ -50,7 +50,7 @@ export class StorageService {
       }
 
       const stream = Readable.from(
-        this.ipfsClient.cat(cidObject, { timeout: 30000 })
+        this.ipfsClient.cat(cidObject, { timeout: 30000 }),
       );
 
       let totalBytes = 0;
@@ -98,7 +98,7 @@ export class StorageService {
       return res;
     } catch (err) {
       Logger.error(
-        `Error pinning file: ${err instanceof Error ? err.message : err}`
+        `Error pinning file: ${err instanceof Error ? err.message : err}`,
       );
       throw err;
     }
@@ -109,7 +109,7 @@ export class StorageService {
       Logger.debug(`Removed pin: ${cid}`);
     } catch (err) {
       Logger.error(
-        `Error removing pin: ${err instanceof Error ? err.message : err}`
+        `Error removing pin: ${err instanceof Error ? err.message : err}`,
       );
       throw err;
     }

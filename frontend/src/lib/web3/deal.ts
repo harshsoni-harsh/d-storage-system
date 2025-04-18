@@ -1,4 +1,7 @@
+import { pinCID } from "@/app/actions";
+import { DealABI } from "@/lib/abi";
 import type { AddressType, DealType } from "@/types/types";
+import { WatchContractEventReturnType } from "viem";
 import {
   getDealContract,
   getMarketplaceContract,
@@ -6,9 +9,6 @@ import {
 } from "./contracts";
 import { currentChain, ensureChain } from "./utils";
 import { getAccount } from "./web3-clients";
-import { DealABI } from "@/lib/abi";
-import { WatchContractEventReturnType } from "viem";
-import { pinCID } from "@/app/actions";
 
 export async function fetchDealDetails(dealAddress: AddressType) {
   const dealContract = await getDealContract(dealAddress);
@@ -45,7 +45,7 @@ export async function approveDeal(userAddress: AddressType) {
   const providerContract = await getProviderContract(providerAddress);
   const { request } = await providerContract.simulate.approveDeal(
     [userAddress],
-    { account }
+    { account },
   );
   await walletClient.writeContract(request);
 }
@@ -63,7 +63,7 @@ export async function getCIDs(dealAddress: AddressType) {
 }
 
 export async function listenDeals(
-  deals: DealType[]
+  deals: DealType[],
 ): Promise<WatchContractEventReturnType[]> {
   const { publicClient } = await ensureChain();
 
@@ -82,7 +82,7 @@ export async function listenDeals(
             } catch (err) {
               console.error(
                 `Error pinning ${cid}`,
-                err instanceof Error ? err.message : err
+                err instanceof Error ? err.message : err,
               );
             }
           }

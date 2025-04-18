@@ -2,828 +2,827 @@
 
 export const DealABI = [
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "_userAddress",
-        "type": "address"
+        internalType: "address",
+        name: "_userAddress",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "_pricePerSector",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_pricePerSector",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_sectorCount",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_validTill",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_validTill",
+        type: "uint256",
       },
       {
-        "internalType": "address",
-        "name": "_marketplaceAddress",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "_marketplaceAddress",
+        type: "address",
+      },
     ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    stateMutability: "nonpayable",
+    type: "constructor",
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": false,
-        "internalType": "string",
-        "name": "cid",
-        "type": "string"
-      }
+        indexed: false,
+        internalType: "string",
+        name: "cid",
+        type: "string",
+      },
     ],
-    "name": "CIDAdded",
-    "type": "event"
+    name: "CIDAdded",
+    type: "event",
   },
   {
-    "inputs": [],
-    "name": "activateDeal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    inputs: [],
+    name: "activateDeal",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "string",
-        "name": "cid",
-        "type": "string"
-      }
+        internalType: "string",
+        name: "cid",
+        type: "string",
+      },
     ],
-    "name": "addCID",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: "addCID",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "completeDeal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    inputs: [],
+    name: "completeDeal",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "completed",
-    "outputs": [
+    inputs: [],
+    name: "completed",
+    outputs: [
       {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "name": "fileCIDs",
-    "outputs": [
+    name: "fileCIDs",
+    outputs: [
       {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "getAllCIDs",
-    "outputs": [
+    inputs: [],
+    name: "getAllCIDs",
+    outputs: [
       {
-        "internalType": "string[]",
-        "name": "",
-        "type": "string[]"
-      }
+        internalType: "string[]",
+        name: "",
+        type: "string[]",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "getDealInfo",
-    "outputs": [
+    inputs: [],
+    name: "getDealInfo",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "_userAddress",
-        "type": "address"
+        internalType: "address",
+        name: "_userAddress",
+        type: "address",
       },
       {
-        "internalType": "address",
-        "name": "_providerAddress",
-        "type": "address"
+        internalType: "address",
+        name: "_providerAddress",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "_pricePerSector",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_pricePerSector",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_sectorCount",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_validTill",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_validTill",
+        type: "uint256",
       },
       {
-        "internalType": "bool",
-        "name": "_isActive",
-        "type": "bool"
+        internalType: "bool",
+        name: "_isActive",
+        type: "bool",
       },
       {
-        "internalType": "bool",
-        "name": "_completed",
-        "type": "bool"
-      }
+        internalType: "bool",
+        name: "_completed",
+        type: "bool",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "isActive",
-    "outputs": [
+    inputs: [],
+    name: "isActive",
+    outputs: [
       {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "marketplace",
-    "outputs": [
+    inputs: [],
+    name: "marketplace",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "pricePerSector",
-    "outputs": [
+    inputs: [],
+    name: "pricePerSector",
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "providerAddress",
-    "outputs": [
+    inputs: [],
+    name: "providerAddress",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "sectorCount",
-    "outputs": [
+    inputs: [],
+    name: "sectorCount",
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "userAddress",
-    "outputs": [
+    inputs: [],
+    name: "userAddress",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "validTill",
-    "outputs": [
+    inputs: [],
+    name: "validTill",
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
-  }
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
 export const MarketplaceABI = [
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "userAddress",
-        "type": "address"
+        indexed: true,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
-      }
+        indexed: true,
+        internalType: "address",
+        name: "provider",
+        type: "address",
+      },
     ],
-    "name": "DealCreated",
-    "type": "event"
+    name: "DealCreated",
+    type: "event",
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "userAddress",
-        "type": "address"
+        indexed: true,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
-      }
+        indexed: true,
+        internalType: "address",
+        name: "provider",
+        type: "address",
+      },
     ],
-    "name": "PaymentReleased",
-    "type": "event"
+    name: "PaymentReleased",
+    type: "event",
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "providerAddress",
-        "type": "address"
+        indexed: true,
+        internalType: "address",
+        name: "providerAddress",
+        type: "address",
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "providerInstance",
-        "type": "address"
-      }
+        indexed: true,
+        internalType: "address",
+        name: "providerInstance",
+        type: "address",
+      },
     ],
-    "name": "ProviderRegistered",
-    "type": "event"
+    name: "ProviderRegistered",
+    type: "event",
   },
   {
-    "inputs": [],
-    "name": "getAllProviders",
-    "outputs": [
+    inputs: [],
+    name: "getAllProviders",
+    outputs: [
       {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
-      }
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "getUserDeals",
-    "outputs": [
+    inputs: [],
+    name: "getUserDeals",
+    outputs: [
       {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
-      }
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "_provider",
-        "type": "address"
+        internalType: "address",
+        name: "_provider",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_sectorCount",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_duration",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "_duration",
+        type: "uint256",
+      },
     ],
-    "name": "initiateDeal",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
+    name: "initiateDeal",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "name": "providerList",
-    "outputs": [
+    name: "providerList",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "name": "provider_instances",
-    "outputs": [
+    name: "provider_instances",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "string",
-        "name": "_ipfsPeerId",
-        "type": "string"
+        internalType: "string",
+        name: "_ipfsPeerId",
+        type: "string",
       },
       {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_sectorCount",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_pricePerSector",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "_pricePerSector",
+        type: "uint256",
+      },
     ],
-    "name": "registerProvider",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: "registerProvider",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "_providerAddress",
-        "type": "address"
+        internalType: "address",
+        name: "_providerAddress",
+        type: "address",
       },
       {
-        "internalType": "address",
-        "name": "_userAddress",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "_userAddress",
+        type: "address",
+      },
     ],
-    "name": "releasePayment",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  }
+    name: "releasePayment",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
 ] as const;
 
 export const ProviderABI = [
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "_walletAddress",
-        "type": "address"
+        internalType: "address",
+        name: "_walletAddress",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "_pricePerSector",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_pricePerSector",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_sectorCount",
+        type: "uint256",
       },
       {
-        "internalType": "string",
-        "name": "_ipfsPeer",
-        "type": "string"
-      }
+        internalType: "string",
+        name: "_ipfsPeer",
+        type: "string",
+      },
     ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    stateMutability: "nonpayable",
+    type: "constructor",
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "userAddress",
-        "type": "address"
+        indexed: false,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "sectorCount",
-        "type": "uint256"
-      }
+        indexed: false,
+        internalType: "uint256",
+        name: "sectorCount",
+        type: "uint256",
+      },
     ],
-    "name": "StorageReleased",
-    "type": "event"
+    name: "StorageReleased",
+    type: "event",
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "userAddress",
-        "type": "address"
+        indexed: false,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "sectorCount",
-        "type": "uint256"
-      }
+        indexed: false,
+        internalType: "uint256",
+        name: "sectorCount",
+        type: "uint256",
+      },
     ],
-    "name": "StorageReserved",
-    "type": "event"
+    name: "StorageReserved",
+    type: "event",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "_dealAddress",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "_dealAddress",
+        type: "address",
+      },
     ],
-    "name": "approveDeal",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
+    name: "approveDeal",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "dealCount",
-    "outputs": [
+    inputs: [],
+    name: "dealCount",
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "name": "deals",
-    "outputs": [
+    name: "deals",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "name": "dealsMapped",
-    "outputs": [
+    name: "dealsMapped",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "exists",
-    "outputs": [
+    inputs: [],
+    name: "exists",
+    outputs: [
       {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "getAllDeals",
-    "outputs": [
+    inputs: [],
+    name: "getAllDeals",
+    outputs: [
       {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
-      }
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "getProviderInfo",
-    "outputs": [
+    inputs: [],
+    name: "getProviderInfo",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
+        internalType: "address",
+        name: "",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
       {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "_userAddress",
-        "type": "address"
+        internalType: "address",
+        name: "_userAddress",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "_pricePerSector",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_pricePerSector",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_sectorCount",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_validTill",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "_validTill",
+        type: "uint256",
+      },
     ],
-    "name": "initiateDeal",
-    "outputs": [
+    name: "initiateDeal",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "stateMutability": "payable",
-    "type": "function"
+    stateMutability: "payable",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "ipfsPeerId",
-    "outputs": [
+    inputs: [],
+    name: "ipfsPeerId",
+    outputs: [
       {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "_userAddress",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "_userAddress",
+        type: "address",
+      },
     ],
-    "name": "isDealActive",
-    "outputs": [
+    name: "isDealActive",
+    outputs: [
       {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "pricePerSector",
-    "outputs": [
+    inputs: [],
+    name: "pricePerSector",
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "userAddress",
-        "type": "address"
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "_sectorCount",
+        type: "uint256",
+      },
     ],
-    "name": "releaseSectors",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: "releaseSectors",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "userAddress",
-        "type": "address"
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "_sectorCount",
+        type: "uint256",
+      },
     ],
-    "name": "reserveSectors",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: "reserveSectors",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "name": "reservedSectors",
-    "outputs": [
+    name: "reservedSectors",
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "sectorCount",
-    "outputs": [
+    inputs: [],
+    name: "sectorCount",
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "string",
-        "name": "_ipfsPeerId",
-        "type": "string"
+        internalType: "string",
+        name: "_ipfsPeerId",
+        type: "string",
       },
       {
-        "internalType": "uint256",
-        "name": "_sectorCount",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "_sectorCount",
+        type: "uint256",
       },
       {
-        "internalType": "uint256",
-        "name": "_pricePerSector",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "_pricePerSector",
+        type: "uint256",
+      },
     ],
-    "name": "updateData",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: "updateData",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "validTill",
-    "outputs": [
+    inputs: [],
+    name: "validTill",
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [],
-    "name": "walletAddress",
-    "outputs": [
+    inputs: [],
+    name: "walletAddress",
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
-  }
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
-

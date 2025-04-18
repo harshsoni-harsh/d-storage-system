@@ -2,6 +2,13 @@
 import { ReactTable } from "@/components/ReactTable";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { chunkifyAndUpload } from "@/lib/utils";
 import { addCID, fetchDealDetails, fetchUserDeals, getCIDs } from "@/lib/web3";
@@ -11,13 +18,6 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { formatEther } from "viem";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 
 export default function UserDeals() {
   const [deals, setDeals] = useState<DealType[]>([]);
@@ -68,18 +68,21 @@ export default function UserDeals() {
     });
   }, []);
 
-  const handleUpload = useCallback(async (dealAddr: AddressType) => {
-    const file = await waitForFile();
+  const handleUpload = useCallback(
+    async (dealAddr: AddressType) => {
+      const file = await waitForFile();
 
-    if (!file) {
-      toast.error("No file selected");
-      return;
-    }
-    const cid = await chunkifyAndUpload(file);
-    if (cid) {
-      await addCID(dealAddr, cid);
-    }
-  }, [waitForFile]);
+      if (!file) {
+        toast.error("No file selected");
+        return;
+      }
+      const cid = await chunkifyAndUpload(file);
+      if (cid) {
+        await addCID(dealAddr, cid);
+      }
+    },
+    [waitForFile],
+  );
 
   const checkCIDs = useCallback(async (dealAddr: AddressType) => {
     const cids = await getCIDs(dealAddr);
@@ -128,7 +131,8 @@ export default function UserDeals() {
       },
       {
         header: "Price",
-        accessorFn: (row: DealType) => `${formatEther(BigInt(row.price)) ?? "N/A"} ETH`
+        accessorFn: (row: DealType) =>
+          `${formatEther(BigInt(row.price)) ?? "N/A"} ETH`,
       },
       {
         header: "Remaining Storage (GB)",

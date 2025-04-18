@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { create as createIpfsClient, KuboRPCClient } from "kubo-rpc-client";
+import { KuboRPCClient, create as createIpfsClient } from "kubo-rpc-client";
 
 const KUBO_URL = process.env.KUBO_URL || "http://localhost:5001";
 

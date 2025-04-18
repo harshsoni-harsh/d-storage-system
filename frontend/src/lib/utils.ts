@@ -19,7 +19,7 @@ export async function chunkifyAndUpload(
   file: File,
   CHUNK_SIZE: number = 10 * 1024 * 1024,
   setCid?: (value: SetStateAction<string>) => void,
-  fetchPinnedFiles?: () => Promise<string[]>
+  fetchPinnedFiles?: () => Promise<string[]>,
 ) {
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
   const hashHex = await getFileHash(file);
@@ -28,7 +28,7 @@ export async function chunkifyAndUpload(
   for (let i = 0; i < totalChunks; i++) {
     const chunk = file.slice(
       i * CHUNK_SIZE,
-      Math.min((i + 1) * CHUNK_SIZE, file.size)
+      Math.min((i + 1) * CHUNK_SIZE, file.size),
     );
 
     const data = await uploadChunk(chunk, i, totalChunks, file.name);

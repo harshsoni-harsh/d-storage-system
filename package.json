@@ -14,5 +14,20 @@
   "packageManager": "pnpm@10.5.2",
   "dependencies": {
     "husky": "^9.1.7"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@ipshipyard/node-datachannel",
+      "@nestjs/core",
+      "sharp",
+      "@biomejs/biome",
+      "bufferutil",
+      "keccak",
+      "utf-8-validate",
+      "secp256k1"
+    ],
+    "patchedDependencies": {
+      "connectkit": "frontend/patches/connectkit.patch"
+    }
   }
 }

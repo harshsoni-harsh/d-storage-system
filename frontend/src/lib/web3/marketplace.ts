@@ -7,7 +7,7 @@ import { getAccount } from "./web3-clients";
 export async function registerProvider(
   peerId: string,
   sectorCount: number,
-  pricePerSector: number
+  pricePerSector: number,
 ) {
   const contract = await getMarketplaceContract();
   const account = await getAccount();
@@ -17,14 +17,14 @@ export async function registerProvider(
   if (isAddressEqual(provider_instance, zeroAddress)) {
     const hash = await contract.write.registerProvider(
       [peerId, BigInt(sectorCount), BigInt(pricePerSector * 1e18)],
-      { account, chain: currentChain }
+      { account, chain: currentChain },
     );
     return hash;
   }
   const providerContract = await getProviderContract(provider_instance);
   const hash = await providerContract.write.updateData(
     [peerId, BigInt(sectorCount), BigInt(pricePerSector * 1e18)],
-    { account, chain: currentChain }
+    { account, chain: currentChain },
   );
   return hash;
 }
@@ -45,7 +45,7 @@ export async function initiateDeal(
   providerAddress: AddressType,
   fileSize: number,
   duration: number,
-  amount: number
+  amount: number,
 ) {
   const { publicClient, walletClient } = await ensureChain();
   const marketplaceContract = await getMarketplaceContract();
@@ -57,7 +57,7 @@ export async function initiateDeal(
       {
         account,
         value: parseEther(amount.toString()),
-      }
+      },
     );
     const hash = await walletClient.writeContract(request);
     const receipt = await publicClient.waitForTransactionReceipt({ hash });

@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { PeersService } from './peers.service.js';
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { PeersService } from "./peers.service.js";
 
-@Controller('peers')
+@Controller("peers")
 export class PeersController {
   constructor(private readonly peersService: PeersService) {}
 
@@ -16,7 +16,7 @@ export class PeersController {
     return await this.peersService.findPeers(peerAddress);
   }
 
-  @Get('get-latency')
+  @Get("get-latency")
   async getLatency(@Query("peerId") peerAddress: string) {
     return await this.peersService.getLatency(peerAddress);
   }

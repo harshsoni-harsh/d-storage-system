@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 async function handlePinning(cid: string) {
   if (!cid) {
-    toast.error("Please enter the CID of the file.")
+    toast.error("Please enter the CID of the file.");
     return;
   }
 

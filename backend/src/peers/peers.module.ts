@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { PeersService } from './peers.service.js';
-import { PeersController } from './peers.controller.js';
-import { IPFSModule } from '../ipfs/ipfs.module.js';
+import { Module } from "@nestjs/common";
+import { IPFSModule } from "../ipfs/ipfs.module.js";
+import { PeersController } from "./peers.controller.js";
+import { PeersService } from "./peers.service.js";
 
 @Module({
   controllers: [PeersController],

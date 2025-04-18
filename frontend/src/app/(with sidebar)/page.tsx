@@ -3,10 +3,10 @@
 import { fetchCID } from "@/app/actions";
 import { getFileHash } from "@/lib/utils";
 import { useState } from "react";
+import { toast } from "sonner";
 import PinnedFiles from "./PinnedFiles";
 import RetrieveFile from "./RetrieveFile";
 import UploadFile from "./Uploadfile";
-import { toast } from "sonner";
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
 
@@ -29,7 +29,7 @@ export default function Home() {
 
 async function handleRetrieve(cid: string) {
   if (!cid) {
-    toast.error("Please enter the CID of the file.")
+    toast.error("Please enter the CID of the file.");
     return;
   }
 

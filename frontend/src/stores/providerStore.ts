@@ -29,26 +29,24 @@ const providerStore = create<StoreState>((set) => ({
             remainingStorage: Number(details.sectorCount),
             validTill: Number(details.validTill),
           } as DealType;
-        })
+        }),
       )) as DealType[];
 
       set({ deals: dealsData });
     } catch (error) {
       console.error(
         "Error fetching deals:",
-        error instanceof Error ? error.message : error
+        error instanceof Error ? error.message : error,
       );
       throw new Error("Error fetching deals");
     }
   },
-  activateDeal: (userAddress: AddressType) => 
+  activateDeal: (userAddress: AddressType) =>
     set(({ deals }) => ({
       deals: deals.map((deal) =>
-        deal.dealAddr === userAddress ? { ...deal, status: "Active" } : deal
+        deal.dealAddr === userAddress ? { ...deal, status: "Active" } : deal,
       ),
     })),
-  
-  
 }));
 
 export default providerStore;

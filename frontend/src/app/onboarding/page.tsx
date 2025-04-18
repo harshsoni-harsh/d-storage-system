@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 import { getIpfsAddress } from "@/app/actions";
+import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { registerProvider } from "@/lib/web3";
 import { toast } from "sonner";
-import Loader from "@/components/Loader";
 
 export default function Onboarding() {
   const [isClient, setIsClient] = useState(true);
@@ -162,11 +162,11 @@ export default function Onboarding() {
               </Button>
             )}
           </CardContent>
-          {
-            loading && <div className="pb-6">
+          {loading && (
+            <div className="pb-6">
               <Loader />
             </div>
-          }
+          )}
         </Card>
       </div>
     </div>
