@@ -46,7 +46,7 @@ export function AppSidebar() {
   const path = usePathname();
 
   return (
-    <Sidebar className="max-w-48">
+    <Sidebar>
       <SidebarHeader className="mx-auto mt-2">
         <ConnectKitButton mode={theme} />
       </SidebarHeader>
