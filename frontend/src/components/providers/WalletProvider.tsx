@@ -2,9 +2,8 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";
-import { http, WagmiProvider, createConfig, injected } from "wagmi";
+import { http, WagmiProvider, createConfig } from "wagmi";
 import { type Chain, mainnet, sepolia } from "wagmi/chains";
-import { walletConnect } from "wagmi/connectors";
 
 const queryClient = new QueryClient();
 
@@ -33,7 +32,6 @@ if (!walletConnectProjectId) {
 
 const config = createConfig({
   chains: [mainnet, sepolia, hardhat],
-  connectors: [walletConnect({ projectId: walletConnectProjectId })],
   transports: {
     [mainnet.id]: http(MAINNET_RPC_URL),
     [sepolia.id]: http(SEPOLIA_RPC_URL),
